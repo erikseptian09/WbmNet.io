@@ -3,15 +3,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/fireba
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBXnXCSXhy06eqWBPzYmzxCo_LBzl51DO4",
-  authDomain: "wibawamulianetwork.firebaseapp.com",
-  databaseURL: "https://wibawamulianetwork-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "wibawamulianetwork",
-  storageBucket: "wibawamulianetwork.firebasestorage.app",
-  messagingSenderId: "605020393823",
-  appId: "1:605020393823:web:e056ed193d9699e64da6ea",
-  measurementId: "G-NNY0Y06HNG"
+  apiKey: "AIzaSyAJ2m4MOTQxw9VgY4IdIO9_E6fiX-9G9VY",
+  authDomain: "paymentpelanggan.firebaseapp.com",
+  databaseURL: "https://paymentpelanggan-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "paymentpelanggan",
+  storageBucket: "paymentpelanggan.firebasestorage.app",
+  messagingSenderId: "788101237037",
+  appId: "1:788101237037:web:5206ab2fe12a958fa42ba4",
+  measurementId: "G-PJCYE6RDZJ"
 };
 
 const app = initializeApp(firebaseConfig);
