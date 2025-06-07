@@ -1,77 +1,79 @@
-/* Reset dan dasar */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Body dasar */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f6f8;
-  color: #333;
-  line-height: 1.6;
+  background-color: #f5f7fa;
+  padding: 20px;
 }
 
+/* Container utama */
 .container {
   max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
+  margin: auto;
   background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 /* Heading */
 h1 {
   text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 30px;
   color: #007bff;
+  margin-bottom: 20px;
 }
 
 /* Tabel */
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 768px;
+  margin-top: 20px;
 }
 
-thead {
+th {
   background-color: #007bff;
   color: white;
-}
-
-th, td {
-  padding: 12px 15px;
+  padding: 12px;
   text-align: center;
-  border-bottom: 1px solid #ddd;
 }
 
-tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
 }
 
-tbody tr:hover {
-  background-color: #f1f1f1;
+tr:nth-child(even) {
+  background-color: #f8f9fa;
 }
 
 /* Tombol aksi */
 button {
   padding: 6px 12px;
-  background-color: #28a745;
-  color: #fff;
+  margin: 2px;
   border: none;
-  border-radius: 5px;
-  font-size: 14px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-  background-color: #218838;
+  opacity: 0.85;
 }
 
+button:nth-child(1) { background-color: #28a745; color: white; }     /* Bayar */
+button:nth-child(2) { background-color: #ffc107; color: #333; }     /* Edit */
+button:nth-child(3) { background-color: #dc3545; color: white; }    /* Hapus */
+button:nth-child(4) { background-color: #17a2b8; color: white; }    /* Notifikasi */
+
+/* Modal */
 .modal {
   position: fixed;
   top: 0;
@@ -84,59 +86,65 @@ button:hover {
   align-items: center;
   z-index: 999;
 }
+
 .modal-content {
-  background: white;
+  background-color: white;
   padding: 20px;
-  border-radius: 10px;
   width: 90%;
   max-width: 400px;
+  border-radius: 12px;
   text-align: left;
-  box-shadow: 0 0 10px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: fadeIn 0.2s ease;
 }
+
 .modal-content h2 {
   margin-bottom: 15px;
   color: #007bff;
 }
+
+.modal-content p {
+  margin: 6px 0;
+  font-size: 15px;
+}
+
 .modal-actions {
   margin-top: 20px;
   text-align: right;
 }
+
 .modal-actions button {
+  padding: 6px 12px;
   margin-left: 10px;
+  font-size: 13px;
+}
+
+/* Faktur Gambar */
+.modal-content img {
+  max-width: 100%;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Animasi */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 /* Responsif */
 @media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 14px;
-  }
-
-  th, td {
-    padding: 10px 8px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
+  table, th, td {
+    font-size: 13px;
   }
 
   button {
     font-size: 13px;
     padding: 5px 10px;
   }
-}
 
-@media (max-width: 480px) {
-  table {
-    min-width: 100%;
-    display: block;
-    overflow-x: auto;
-  }
-
-  button {
-    padding: 5px 8px;
+  .modal-content {
+    padding: 15px;
   }
 }
