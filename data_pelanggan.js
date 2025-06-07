@@ -1,37 +1,41 @@
 import { db } from "./firebase.js";
 import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
+// Fungsi untuk ambil dan tampilkan data dari node 'pelanggan'
+const input = document.getElementById("fileInput");
 const tbody = document.getElementById("dataPelangganBody");
 
-// Fungsi untuk ambil dan tampilkan data dari node 'pelanggan'
-function tampilkanDataPelanggan() {
-  const dbRef = ref(db);
-  get(child(dbRef, "pelanggan")).then((snapshot) => {
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      tbody.innerHTML = "";
+input.addEventListener("change", function () {
+  const file = input.files[0];
+  if (!file) return;
 
-      Object.entries(data).forEach(([id, pel]) => {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const json = JSON.parse(e.target.result);
+
+      // Cek apakah root-nya 'pelanggan'
+      const data = json.pelanggan || json;
+
+      tbody.innerHTML = ""; // Kosongkan isi tabel
+
+      Object.values(data).forEach((pel) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${pel.nama ?? '-'}</td>
-          <td>${pel.idPelanggan ?? '-'}</td>
-          <td>${pel.paket ?? '-'}</td>
-          <td>Rp ${pel.harga?.toLocaleString("id-ID") ?? '0'}</td>
-          <td>${pel.telepon ?? '-'}</td>
-          <td>${pel.alamat ?? '-'}</td>
-          <td><button onclick="alert('Fitur bayar belum diaktifkan')">Bayar</button></td>
+          <td>${pel.nama || '-'}</td>
+          <td>${pel.idPelanggan || '-'}</td>
+          <td>${pel.paket || '-'}</td>
+          <td>Rp ${pel.harga?.toLocaleString("id-ID") || '0'}</td>
+          <td>${pel.telepon || '-'}</td>
+          <td>${pel.alamat || '-'}</td>
         `;
         tbody.appendChild(row);
       });
-    } else {
-      tbody.innerHTML = `<tr><td colspan="7">Tidak ada data pelanggan.</td></tr>`;
-    }
-  }).catch((error) => {
-    console.error("Gagal mengambil data:", error);
-    tbody.innerHTML = `<tr><td colspan="7">Terjadi kesalahan saat mengambil data.</td></tr>`;
-  });
-}
 
-// Jalankan saat halaman dimuat
-tampilkanDataPelanggan();
+    } catch (err) {
+      alert("File JSON tidak valid.");
+    }
+  };
+
+  reader.readAsText(file);
+});
