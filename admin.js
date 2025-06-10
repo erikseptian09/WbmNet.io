@@ -1,59 +1,60 @@
-import { getDatabase, ref, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { app } from "./firebase.js"; // Ambil dari firebase.js
+import { db } from "./firebase.js";
+import {
+  ref,
+  set,
+  onValue,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const db = getDatabase(app);
-const pelangganRef = ref(db, 'pelanggan');
+const nama = document.getElementById("nama");
+const idPelanggan = document.getElementById("idPelanggan");
+const paket = document.getElementById("paket");
+const harga = document.getElementById("harga");
+const telepon = document.getElementById("telepon");
+const alamat = document.getElementById("alamat");
+const tambahBtn = document.getElementById("tambahBtn");
+const tabel = document.getElementById("tabelPelanggan");
 
-const namaInput = document.getElementById('nama');
-const paketInput = document.getElementById('paket');
-const hargaInput = document.getElementById('harga');
-const tambahBtn = document.getElementById('tambahBtn');
-const tabelBody = document.getElementById('tabelPelanggan');
-
-// Tambah pelanggan baru
-tambahBtn.onclick = async () => {
+tambahBtn.addEventListener("click", () => {
   const id = `pel${Date.now()}`;
-  if (namaInput.value && paketInput.value && hargaInput.value) {
-    await set(ref(db, `pelanggan/${id}`), {
-      nama: namaInput.value,
-      paket: paketInput.value,
-      harga: parseInt(hargaInput.value),
-      status: 'aktif'
-    });
-    namaInput.value = paketInput.value = hargaInput.value = '';
-  }
-};
-
-// Tampilkan data real-time
-onValue(pelangganRef, (snapshot) => {
-  tabelBody.innerHTML = '';
-  const data = snapshot.val();
-  if (data) {
-    Object.entries(data).forEach(([id, item]) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item.nama}</td>
-        <td>${item.paket}</td>
-        <td>Rp ${item.harga}</td>
-        <td>${item.status}</td>
-        <td>
-          <button onclick="hapusPelanggan('${id}')">Hapus</button>
-          <button onclick="ubahStatus('${id}', '${item.status}')">
-            ${item.status === 'aktif' ? 'Bayar' : 'Aktifkan'}
-          </button>
-        </td>
-      `;
-      tabelBody.appendChild(row);
-    });
-  }
+  const data = {
+    nama: nama.value,
+    idPelanggan: idPelanggan.value,
+    paket: paket.value,
+    harga: parseInt(harga.value),
+    telepon: telepon.value,
+    alamat: alamat.value
+  };
+  set(ref(db, `pelanggan/${id}`), data);
+  nama.value = idPelanggan.value = paket.value = harga.value = telepon.value = alamat.value = "";
 });
 
-// Fungsi global agar bisa diakses dari tombol
+function tampilkanData() {
+  const pelangganRef = ref(db, "pelanggan");
+  onValue(pelangganRef, (snapshot) => {
+    const data = snapshot.val();
+    tabel.innerHTML = "";
+    if (data) {
+      Object.keys(data).forEach((id) => {
+        const p = data[id];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${p.nama}</td>
+          <td>${p.idPelanggan}</td>
+          <td>${p.paket}</td>
+          <td>Rp ${p.harga.toLocaleString()}</td>
+          <td>${p.telepon}</td>
+          <td>${p.alamat}</td>
+          <td><button onclick="hapusPelanggan('${id}')">Hapus</button></td>
+        `;
+        tabel.appendChild(row);
+      });
+    }
+  });
+}
+
 window.hapusPelanggan = (id) => {
   remove(ref(db, `pelanggan/${id}`));
 };
 
-window.ubahStatus = (id, statusSekarang) => {
-  const statusBaru = statusSekarang === 'aktif' ? 'lunas' : 'aktif';
-  update(ref(db, `pelanggan/${id}`), { status: statusBaru });
-};
+tampilkanData();
