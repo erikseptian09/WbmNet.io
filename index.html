@@ -3,29 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Data Pembayaran Pelanggan</title>
+  <title>Admin WiFi</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Daftar Pelanggan Aktif</h1>
-    <table id="tabelPelanggan">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>ID</th>
-          <th>Paket</th>
-          <th>Harga</th>
-          <th>Telepon</th>
-          <th>Alamat</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="dataPelangganBody"></tbody>
-    </table>
-  </div>
+  <h1>Admin Panel - Pelanggan WiFi</h1>
 
- <script type="module" src="firebase.js"></script>
- <script type="module" src="data_pelanggan.js"></script>
+  <section id="form">
+    <input type="text" id="nama" placeholder="Nama Pelanggan" />
+    <input type="text" id="paket" placeholder="Paket (misal 10 Mbps)" />
+    <input type="number" id="harga" placeholder="Harga" />
+    <button id="tambahBtn">Tambah Pelanggan</button>
+  </section>
+
+  <section>
+    <h2>Daftar Pelanggan</h2>
+    <table>
+      <thead>
+        <tr><th>Nama</th><th>Paket</th><th>Harga</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody id="tabelPelanggan"></tbody>
+    </table>
+  </section>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="admin.js"></script>
 </body>
 </html>
