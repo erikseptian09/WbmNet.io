@@ -1,39 +1,16 @@
+// admin.js
 import { db } from "./firebase.js";
-import {
-  ref,
-  set,
-  onValue,
-  remove
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const nama = document.getElementById("nama");
-const idPelanggan = document.getElementById("idPelanggan");
-const paket = document.getElementById("paket");
-const harga = document.getElementById("harga");
-const telepon = document.getElementById("telepon");
-const alamat = document.getElementById("alamat");
-const tambahBtn = document.getElementById("tambahBtn");
 const tabel = document.getElementById("tabelPelanggan");
-
-tambahBtn.addEventListener("click", () => {
-  const id = `pel${Date.now()}`;
-  const data = {
-    nama: nama.value,
-    idPelanggan: idPelanggan.value,
-    paket: paket.value,
-    harga: parseInt(harga.value),
-    telepon: telepon.value,
-    alamat: alamat.value
-  };
-  set(ref(db, `pelanggan/${id}`), data);
-  nama.value = idPelanggan.value = paket.value = harga.value = telepon.value = alamat.value = "";
-});
 
 function tampilkanData() {
   const pelangganRef = ref(db, "pelanggan");
+
   onValue(pelangganRef, (snapshot) => {
     const data = snapshot.val();
-    tabel.innerHTML = "";
+    tabel.innerHTML = ""; // Bersihkan isi tabel
+
     if (data) {
       Object.keys(data).forEach((id) => {
         const p = data[id];
@@ -42,19 +19,17 @@ function tampilkanData() {
           <td>${p.nama}</td>
           <td>${p.idPelanggan}</td>
           <td>${p.paket}</td>
-          <td>Rp ${p.harga.toLocaleString()}</td>
+          <td>Rp ${p.harga}</td>
           <td>${p.telepon}</td>
           <td>${p.alamat}</td>
           <td><button onclick="hapusPelanggan('${id}')">Hapus</button></td>
         `;
         tabel.appendChild(row);
       });
+    } else {
+      tabel.innerHTML = "<tr><td colspan='7'>Data kosong</td></tr>";
     }
   });
 }
-
-window.hapusPelanggan = (id) => {
-  remove(ref(db, `pelanggan/${id}`));
-};
 
 tampilkanData();
