@@ -1,5 +1,8 @@
-import { db } from './firebase-config.js';
-import { collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getDatabase, ref, onValue, set, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { app } from "./firebase.js"; // Ambil dari firebase.js
+
+const db = getDatabase(app);
+const pelangganRef = ref(db, 'pelanggan');
 
 const namaInput = document.getElementById('nama');
 const paketInput = document.getElementById('paket');
@@ -7,11 +10,11 @@ const hargaInput = document.getElementById('harga');
 const tambahBtn = document.getElementById('tambahBtn');
 const tabelBody = document.getElementById('tabelPelanggan');
 
-const pelangganRef = collection(db, 'pelanggan');
-
+// Tambah pelanggan baru
 tambahBtn.onclick = async () => {
+  const id = `pel${Date.now()}`;
   if (namaInput.value && paketInput.value && hargaInput.value) {
-    await addDoc(pelangganRef, {
+    await set(ref(db, `pelanggan/${id}`), {
       nama: namaInput.value,
       paket: paketInput.value,
       harga: parseInt(hargaInput.value),
@@ -21,32 +24,36 @@ tambahBtn.onclick = async () => {
   }
 };
 
-onSnapshot(pelangganRef, (snapshot) => {
+// Tampilkan data real-time
+onValue(pelangganRef, (snapshot) => {
   tabelBody.innerHTML = '';
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${data.nama}</td>
-      <td>${data.paket}</td>
-      <td>Rp ${data.harga}</td>
-      <td>${data.status}</td>
-      <td>
-        <button onclick="hapusPelanggan('${docSnap.id}')">Hapus</button>
-        <button onclick="updateStatus('${docSnap.id}', '${data.status}')">
-          ${data.status === 'aktif' ? 'Bayar' : 'Aktifkan'}
-        </button>
-      </td>
-    `;
-    tabelBody.appendChild(row);
-  });
+  const data = snapshot.val();
+  if (data) {
+    Object.entries(data).forEach(([id, item]) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.nama}</td>
+        <td>${item.paket}</td>
+        <td>Rp ${item.harga}</td>
+        <td>${item.status}</td>
+        <td>
+          <button onclick="hapusPelanggan('${id}')">Hapus</button>
+          <button onclick="ubahStatus('${id}', '${item.status}')">
+            ${item.status === 'aktif' ? 'Bayar' : 'Aktifkan'}
+          </button>
+        </td>
+      `;
+      tabelBody.appendChild(row);
+    });
+  }
 });
 
-window.hapusPelanggan = async (id) => {
-  await deleteDoc(doc(db, 'pelanggan', id));
+// Fungsi global agar bisa diakses dari tombol
+window.hapusPelanggan = (id) => {
+  remove(ref(db, `pelanggan/${id}`));
 };
 
-window.updateStatus = async (id, currentStatus) => {
-  const newStatus = currentStatus === 'aktif' ? 'lunas' : 'aktif';
-  await updateDoc(doc(db, 'pelanggan', id), { status: newStatus });
+window.ubahStatus = (id, statusSekarang) => {
+  const statusBaru = statusSekarang === 'aktif' ? 'lunas' : 'aktif';
+  update(ref(db, `pelanggan/${id}`), { status: statusBaru });
 };
