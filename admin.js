@@ -16,14 +16,20 @@ function tampilkanData() {
         const p = data[id];
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${p.nama}</td>
-          <td>${p.idPelanggan}</td>
-          <td>${p.paket}</td>
-          <td>Rp ${p.harga}</td>
-          <td>${p.telepon}</td>
-          <td>${p.alamat}</td>
-          <td><button onclick="hapusPelanggan('${id}')">Hapus</button></td>
-        `;
+  <td>${p.nama}</td>
+  <td>${p.idPelanggan}</td>
+  <td>${p.paket}</td>
+  <td>Rp ${p.harga}</td>
+  <td>${p.telepon}</td>
+  <td>${p.alamat}</td>
+  <td>${p.status || 'aktif'}</td>
+  <td>
+    <button onclick="hapusPelanggan('${id}')">Hapus</button>
+    <button onclick="ubahStatus('${id}', '${p.status || 'aktif'}')">
+      ${p.status === 'lunas' ? 'Aktifkan' : 'Bayar'}
+    </button>
+  </td>
+`;
         tabel.appendChild(row);
       });
     } else {
