@@ -2,42 +2,27 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin WiFi</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Admin Pelanggan WiFi</title>
 </head>
 <body>
-  <h1>Panel Admin - Data Pelanggan</h1>
+  <h1>Data Pelanggan</h1>
+  <table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>ID</th>
+        <th>Paket</th>
+        <th>Harga</th>
+        <th>Telepon</th>
+        <th>Alamat</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabelPelanggan">
+      <tr><td colspan="7">Memuat data...</td></tr>
+    </tbody>
+  </table>
 
-  <section class="form-container">
-    <input type="text" id="nama" placeholder="Nama Pelanggan" />
-    <input type="text" id="idPelanggan" placeholder="ID Pelanggan" />
-    <input type="text" id="paket" placeholder="Paket" />
-    <input type="number" id="harga" placeholder="Harga" />
-    <input type="text" id="telepon" placeholder="Telepon" />
-    <input type="text" id="alamat" placeholder="Alamat" />
-    <button id="tambahBtn">Tambah</button>
-  </section>
-
-  <section>
-    <h2>Daftar Pelanggan</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>ID</th>
-          <th>Paket</th>
-          <th>Harga</th>
-          <th>Telepon</th>
-          <th>Alamat</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tabelPelanggan"></tbody>
-    </table>
-  </section>
-
-  <script type="module" src="firebase.js"></script>
   <script type="module" src="admin.js"></script>
 </body>
 </html>
