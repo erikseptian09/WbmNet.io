@@ -126,39 +126,36 @@
       document.getElementById("modalKonfirmasi").style.display = "none";
     }
 
-    function tampilkanDaftarKonfirmasi() {
-      const daftar = document.getElementById("daftarKonfirmasi");
-      daftar.innerHTML = "Loading...";
+    async function loadKonfirmasiPembayaran() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbyYmfAKykfaDARjWk_zbXf9QkMQyrfOYGcYUrKnnFN_NF0jObVsZHjspDq9WyK72vYWEQ/exec");
+    const data = await response.json();
 
-      db.ref("konfirmasi").once("value").then(snapshot => {
-        if (!snapshot.exists()) {
-          daftar.innerHTML = "<p>Tidak ada bukti pembayaran.</p>";
-          return;
-        }
+    const tbody = document.getElementById("daftarKonfirmasi");
+    tbody.innerHTML = "";
 
-        let html = '<table class="konfirmasi-table">';
-        html += '<tr><th>Nama</th><th>No HP</th><th>Bukti</th><th>Aksi</th></tr>';
+    data.forEach(item => {
+      const row = document.createElement("tr");
 
-        snapshot.forEach(child => {
-          const id = child.key;
-          const data = child.val();
-          html += `
-            <tr>
-              <td>${data.nama}</td>
-              <td>${data.nohp}</td>
-              <td><a href="${data.bukti_url}" target="_blank">Lihat</a></td>
-              <td>
-                <button onclick="konfirmasiPembayaran('${id}')">✔</button>
-                <button onclick="tolakPembayaran('${id}')">✘</button>
-              </td>
-            </tr>
-          `;
-        });
+      // tampilkan thumbnail bukti (base64 image)
+      const imgHTML = item.bukti.startsWith("data:image")
+        ? `<img src="${item.bukti}" alt="Bukti" width="60" style="cursor:pointer" onclick="bukaGambar('${item.bukti}')">`
+        : `<a href="${item.bukti}" target="_blank">Lihat</a>`;
 
-        html += '</table>';
-        daftar.innerHTML = html;
-      });
-    }
+      row.innerHTML = `
+        <td>${item.nama}</td>
+        <td>${item.nohp}</td>
+        <td>${item.paket}</td>
+        <td>${item.harga}</td>
+        <td>${item.waktu}</td>
+        <td>${imgHTML}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Gagal ambil data:", error);
+  }
+}
 
     function konfirmasiPembayaran(id) {
       db.ref("konfirmasi/" + id).once("value").then(snap => {
