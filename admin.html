@@ -1,40 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Admin</title>
-  <link rel="stylesheet" href="billing.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
   <div class="container">
-    <h2>Konfirmasi Pembayaran</h2>
-    <div id="list"></div>
+    <h2>Dashboard Admin</h2>
+    <table id="tabelPelanggan">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Telepon</th>
+          <th>Paket</th>
+          <th>Harga</th>
+          <th>Keterangan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="config.js"></script>
   <script>
-    const list = document.getElementById("list");
+    const db = firebase.database();
+    const tbody = document.querySelector("#tabelPelanggan tbody");
 
-    firebase.database().ref("konfirmasi").on("value", (snapshot) => {
-      list.innerHTML = "";
-      snapshot.forEach((child) => {
+    db.ref("pelanggan").once("value").then(snapshot => {
+      let no = 1;
+      snapshot.forEach(child => {
+        const id = child.key;
         const data = child.val();
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <p><b>${data.nama}</b> (${data.nohp})</p>
-          <img src="${data.bukti_url}" width="200">
-          <p>Status: ${data.status}</p>
-          <button onclick="setLunas('${data.nohp}')">Konfirmasi Lunas</button>
-          <hr>
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${no++}</td>
+          <td>${data.nama}</td>
+          <td>${data.telepon}</td>
+          <td>${data.paket}</td>
+          <td>${data.harga}</td>
+          <td>${data.keterangan}</td>
+          <td>
+            <button class="aksi-btn edit" onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
+            <button class="aksi-btn hapus" onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
+            <button class="aksi-btn notif" onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
+            <button class="aksi-btn konfirmasi" onclick="konfirmasiPembayaran('${id}')"><i class="fas fa-check-circle"></i></button>
+          </td>
         `;
-        list.appendChild(div);
+        tbody.appendChild(row);
       });
     });
 
-    function setLunas(nohp) {
-      firebase.database().ref("pelanggan/" + nohp).update({ status: "Lunas" });
-      firebase.database().ref("konfirmasi/" + nohp).remove();
-      alert("Pembayaran dikonfirmasi lunas.");
+    function editPelanggan(id) {
+      alert("Edit pelanggan: " + id);
+    }
+
+    function hapusPelanggan(id) {
+      if (confirm("Yakin ingin menghapus pelanggan ini?")) {
+        db.ref("pelanggan/" + id).remove().then(() => {
+          alert("Pelanggan dihapus!");
+          location.reload();
+        });
+      }
+    }
+
+    function kirimNotifikasi(id) {
+      db.ref("pelanggan/" + id).once("value").then(snap => {
+        const data = snap.val();
+        const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
+        db.ref("notifikasi/" + id).push({
+          nama: data.nama,
+          paket: data.paket,
+          harga: data.harga,
+          waktu: new Date().toLocaleString('id-ID'),
+          pesan: pesan,
+          status: 'belum dibaca'
+        }).then(() => alert("Notifikasi dikirim!"));
+      });
+    }
+
+    function konfirmasiPembayaran(id) {
+      db.ref("pelanggan/" + id).update({ keterangan: "Lunas" }).then(() => {
+        alert("✅ Pembayaran dikonfirmasi lunas!");
+        location.reload();
+      });
     }
   </script>
 </body>
