@@ -4,12 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Admin</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="billing.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
   <div class="container">
     <h2>Dashboard Admin</h2>
+
+    <input type="text" id="searchInput" placeholder="🔍 Cari pelanggan...">
+  
+    <div class="table-wrapper">
     <table id="tabelPelanggan">
       <thead>
         <tr>
@@ -25,6 +29,16 @@
       <tbody></tbody>
     </table>
   </div>
+  </div>
+
+  <!-- Modal Konfirmasi Pembayaran -->
+  <div id="modalKonfirmasi" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="tutupModalKonfirmasi()">&times;</span>
+      <h3>Daftar Konfirmasi Pembayaran</h3>
+      <div id="daftarKonfirmasi">Loading...</div>
+    </div>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -32,30 +46,37 @@
   <script>
     const db = firebase.database();
     const tbody = document.querySelector("#tabelPelanggan tbody");
+    const searchInput = document.getElementById("searchInput");
 
-    db.ref("pelanggan").once("value").then(snapshot => {
-      let no = 1;
-      snapshot.forEach(child => {
-        const id = child.key;
-        const data = child.val();
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${no++}</td>
-          <td>${data.nama}</td>
-          <td>${data.telepon}</td>
-          <td>${data.paket}</td>
-          <td>${data.harga}</td>
-          <td>${data.keterangan}</td>
-          <td>
-            <button class="aksi-btn edit" onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
-            <button class="aksi-btn hapus" onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
-            <button class="aksi-btn notif" onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
-            <button class="aksi-btn konfirmasi" onclick="konfirmasiPembayaran('${id}')"><i class="fas fa-check-circle"></i></button>
-          </td>
-        `;
-        tbody.appendChild(row);
+    // Tampilkan pelanggan
+    function tampilkanPelanggan() {
+      tbody.innerHTML = "";
+      db.ref("pelanggan").once("value").then(snapshot => {
+        let no = 1;
+        snapshot.forEach(child => {
+          const id = child.key;
+          const data = child.val();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${no++}</td>
+            <td>${data.nama}</td>
+            <td>${data.telepon}</td>
+            <td>${data.paket}</td>
+            <td>${data.harga}</td>
+            <td>${data.keterangan}</td>
+            <td>
+              <button class="aksi-btn edit" onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
+              <button class="aksi-btn hapus" onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
+              <button class="aksi-btn notif" onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
+              <button class="aksi-btn konfirmasi" onclick="bukaModalKonfirmasi()"><i class="fas fa-check-circle"></i></button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
       });
-    });
+    }
+
+    tampilkanPelanggan();
 
     function editPelanggan(id) {
       alert("Edit pelanggan: " + id);
@@ -65,7 +86,7 @@
       if (confirm("Yakin ingin menghapus pelanggan ini?")) {
         db.ref("pelanggan/" + id).remove().then(() => {
           alert("Pelanggan dihapus!");
-          location.reload();
+          tampilkanPelanggan();
         });
       }
     }
@@ -85,12 +106,81 @@
       });
     }
 
-    function konfirmasiPembayaran(id) {
-      db.ref("pelanggan/" + id).update({ keterangan: "Lunas" }).then(() => {
-        alert("✅ Pembayaran dikonfirmasi lunas!");
-        location.reload();
+    // MODAL KONFIRMASI
+    function bukaModalKonfirmasi() {
+      document.getElementById("modalKonfirmasi").style.display = "block";
+      tampilkanDaftarKonfirmasi();
+    }
+
+    function tutupModalKonfirmasi() {
+      document.getElementById("modalKonfirmasi").style.display = "none";
+    }
+
+    function tampilkanDaftarKonfirmasi() {
+      const daftar = document.getElementById("daftarKonfirmasi");
+      daftar.innerHTML = "Loading...";
+
+      db.ref("konfirmasi").once("value").then(snapshot => {
+        if (!snapshot.exists()) {
+          daftar.innerHTML = "<p>Tidak ada bukti pembayaran.</p>";
+          return;
+        }
+
+        let html = '<table class="konfirmasi-table">';
+        html += '<tr><th>Nama</th><th>No HP</th><th>Bukti</th><th>Aksi</th></tr>';
+
+        snapshot.forEach(child => {
+          const id = child.key;
+          const data = child.val();
+          html += `
+            <tr>
+              <td>${data.nama}</td>
+              <td>${data.nohp}</td>
+              <td><a href="${data.bukti_url}" target="_blank">Lihat</a></td>
+              <td>
+                <button onclick="konfirmasiPembayaran('${id}')">✔</button>
+                <button onclick="tolakPembayaran('${id}')">✘</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        html += '</table>';
+        daftar.innerHTML = html;
       });
     }
+
+    function konfirmasiPembayaran(id) {
+      db.ref("konfirmasi/" + id).once("value").then(snap => {
+        const data = snap.val();
+
+        db.ref("pelanggan/lunas/" + id).set(data);
+        db.ref("pelanggan/aktif/" + id).remove();
+        db.ref("konfirmasi/" + id).remove();
+
+        alert("Pembayaran dikonfirmasi.");
+        tampilkanDaftarKonfirmasi();
+      });
+    }
+
+    function tolakPembayaran(id) {
+      if (confirm("Tolak bukti pembayaran ini?")) {
+        db.ref("konfirmasi/" + id).remove().then(() => {
+          alert("Konfirmasi ditolak.");
+          tampilkanDaftarKonfirmasi();
+        });
+      }
+    }
+
+    // FITUR SEARCH
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value.toLowerCase();
+      const rows = tbody.querySelectorAll("tr");
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(keyword) ? "" : "none";
+      });
+    });
   </script>
 </body>
 </html>
