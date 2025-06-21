@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Pelanggan</title>
+  <link rel="stylesheet" href="billing.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Selamat Datang, <span id="namaPelanggan"></span></h2>
+    <p>Silakan transfer ke rekening berikut:</p>
+    <b>Bank BCA - 1234567890 a.n. Nama Anda</b>
+    <p>Setelah transfer, upload bukti di bawah:</p>
+    <input type="file" id="bukti">
+    <button onclick="uploadBukti()">Upload Bukti</button>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script>
+    const nama = localStorage.getItem("nama");
+    const nohp = localStorage.getItem("nohp");
+    document.getElementById("namaPelanggan").textContent = nama;
+
+    function uploadBukti() {
+      const file = document.getElementById("bukti").files[0];
+      if (!file) return alert("Pilih file bukti!");
+
+      const ref = firebase.storage().ref("bukti_transfer/" + nohp);
+      ref.put(file).then(() => {
+        ref.getDownloadURL().then((url) => {
+          firebase.database().ref("konfirmasi/" + nohp).set({
+            nama,
+            nohp,
+            bukti_url: url,
+            status: "Menunggu Konfirmasi"
+          });
+          alert("Bukti terkirim. Menunggu konfirmasi admin.");
+        });
+      });
+    }
+  </script>
+</body>
+</html>

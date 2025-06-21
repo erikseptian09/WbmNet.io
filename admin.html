@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Admin</title>
+  <link rel="stylesheet" href="billing.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Konfirmasi Pembayaran</h2>
+    <div id="list"></div>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script>
+    const list = document.getElementById("list");
+
+    firebase.database().ref("konfirmasi").on("value", (snapshot) => {
+      list.innerHTML = "";
+      snapshot.forEach((child) => {
+        const data = child.val();
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><b>${data.nama}</b> (${data.nohp})</p>
+          <img src="${data.bukti_url}" width="200">
+          <p>Status: ${data.status}</p>
+          <button onclick="setLunas('${data.nohp}')">Konfirmasi Lunas</button>
+          <hr>
+        `;
+        list.appendChild(div);
+      });
+    });
+
+    function setLunas(nohp) {
+      firebase.database().ref("pelanggan/" + nohp).update({ status: "Lunas" });
+      firebase.database().ref("konfirmasi/" + nohp).remove();
+      alert("Pembayaran dikonfirmasi lunas.");
+    }
+  </script>
+</body>
+</html>

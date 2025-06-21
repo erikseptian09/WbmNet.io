@@ -1,0 +1,108 @@
+/* Reset dan font dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: #f7f9fc;
+  color: #333;
+  padding: 20px;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+  text-align: center;
+  color: #1a73e8;
+  margin-bottom: 20px;
+}
+
+p {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+input[type="text"], input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border 0.2s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="file"]:focus {
+  border-color: #1a73e8;
+  outline: none;
+}
+
+button {
+  padding: 12px 24px;
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #0b59c7;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Gaya tampilan bukti transfer */
+img {
+  margin-top: 10px;
+  max-width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* Admin panel item */
+#list > div {
+  background-color: #f9fbff;
+  padding: 20px;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+hr {
+  margin-top: 20px;
+  border: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Responsif */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  input, button {
+    font-size: 14px;
+  }
+}

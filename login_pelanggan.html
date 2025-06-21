@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Pelanggan</title>
+  <link rel="stylesheet" href="billing.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Login Pelanggan</h2>
+    <input type="text" id="nohp" placeholder="Nomor HP">
+    <button onclick="loginPelanggan()">Login</button>
+  </div>
+
+  <script>
+    function loginPelanggan() {
+      const nohp = document.getElementById("nohp").value;
+      if (!nohp) return alert("Masukkan No HP");
+
+      firebase.database().ref("pelanggan/" + nohp).once("value", (snap) => {
+        if (snap.exists()) {
+          localStorage.setItem("nohp", nohp);
+          localStorage.setItem("nama", snap.val().nama || "");
+          window.location.href = "pelanggan.html";
+        } else {
+          alert("Nomor tidak terdaftar.");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
