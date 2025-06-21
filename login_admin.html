@@ -17,18 +17,24 @@
   </div>
 
   <script>
-    function loginAdmin() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  function loginAdmin() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(() => {
-          window.location.href = "admin.html";
-        })
-        .catch(error => {
-          alert("Login gagal: " + error.message);
-        });
-    }
-  </script>
+  if (!email || !password) {
+    alert("Email dan Password wajib diisi.");
+    return;
+  }
+
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(() => {
+      alert("Login berhasil!");
+      window.location.href = "admin.html";
+    })
+    .catch(error => {
+      alert("Login gagal: " + error.message);
+    });
+}
+</script>
 </body>
 </html>
