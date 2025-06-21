@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wibawamulia.Network</title>
+  
+    <!-- Manifest dan Ikon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <meta name="theme-color" content="#0d6efd">
+
+  <!-- Untuk iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="eBilling">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">Wibawamulia.Network</a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link active" href="#">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="#tentang">Tentang</a></li>
+        <li class="nav-item"><a class="nav-link" href="#paket">Paket</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimoni">Testimoni</a></li>
+        <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+        <li class="nav-item"><a class="nav-link" href="login_admin.html">Admin</a></li>
+        <li class="nav-item"><a class="nav-link" href="login_pelanggan.html">Pelanggan</a></li>
+        <button id="installBtn" style="display: none;">Install Aplikasi</button>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero text-white text-center">
+  <h1 id="typed-text"><span id="part1"></span><span id="part2"></span></h1>
+  <p class="lead" style="animation: fadeIn 2s ease-in;">Layanan Internet Berkualitas untuk Rumah dan Usaha Anda</p>
+</header>
+
+<!-- Main Content -->
+<main class="container py-5">
+  
+  <!-- Tentang -->
+  <section id="tentang" class="scroll-offset mb-5">
+    <div class="boxed-section text-center">
+      <h2 class="mb-4">Tentang Kami</h2>
+      <p>Wbm.Net menyediakan layanan internet cepat dan stabil untuk berbagai kebutuhan. Dengan harga terjangkau dan layanan pelanggan yang responsif, kami berkomitmen memberikan pengalaman terbaik bagi setiap pelanggan kami.</p>
+    </div>
+  </section>
+
+  <!-- Paket -->
+  <section id="paket" class="scroll-offset mb-5">
+    <div class="boxed-section">
+      <h2 class="text-center mb-4">Paket Layanan</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card p-4 text-center h-100">
+            <h5><strong> Instalasi Awal </strong></h5>
+            <p style="color: #00ccff; font-size: 20px;"><strong>Rp. 350.000,00</strong></p>
+          </div>
+        </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card p-4 text-center h-100">
+            <h5><i class="fas fa-wifi"></i> Paket Basic</h5>
+            <p>Up to 5 Mbps</p>
+            <p>Rp150.000 / bulan</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 text-center h-100">
+            <h5><i class="fas fa-home"></i> Paket Family</h5>
+            <p>Up to 7 Mbps</p>
+            <p>Rp170.000 / bulan</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-4 text-center h-100">
+            <h5><i class="fas fa-briefcase"></i> Paket Profesional</h5>
+            <p>Up to 10 Mbps</p>
+            <p>Rp200.000 / bulan</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimoni -->
+  <section id="testimoni" class="scroll-offset mb-5">
+    <div class="boxed-section">
+      <h2 class="text-center mb-4">Testimoni Pelanggan</h2>
+      <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner text-center">
+          <div class="carousel-item active"><p>"Layanannya cepat dan stabil!"</p><small>- Andi</small></div>
+          <div class="carousel-item"><p>"Harga terjangkau dan pelayanan cepat!"</p><small>- Siti</small></div>
+          <div class="carousel-item"><p>"Support sangat membantu kapanpun saya butuh."</p><small>- Budi</small></div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontak -->
+  <section id="kontak" class="scroll-offset">
+    <div class="boxed-section text-center">
+      <h2 class="mb-4">Hubungi Kami</h2>
+      <ul class="list-unstyled">
+        <li><strong><i class="fas fa-phone"></i> Telepon:</strong> 0858-1723-0536</li>
+        <li><strong><i class="fas fa-envelope"></i> Email:</strong> wbmnet2020@gmail.com</li>
+        <li><strong><i class="fas fa-map-marker-alt"></i> Alamat:</strong> Jl. Cigutul-Lewimalang, Wibawamulya, Cibarusah, Bekasi</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-dark text-center text-white py-4">
+  &copy; 2025 Wibawamulia.Network. Semua Hak Dilindungi.
+</footer>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/6285817230536" class="btn btn-success position-fixed" 
+   style="bottom: 20px; right: 20px; z-index: 999; box-shadow: 0 0 15px #00ffcc;">
+  <i class="fab fa-whatsapp"></i> Chat WA
+</a>
+
+<!-- Scroll to Top -->
+<button onclick="scrollToTop()" class="btn btn-light position-fixed" style="bottom: 80px; right: 20px; z-index: 999;">↑</button>
+  <!-- Spinner Loading -->
+<div id="loadingOverlay" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:#ffffffee; z-index:9999; justify-content:center; align-items:center;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/scrollreveal"></script>
+  <script>
+  window.addEventListener("load", () => {
+    document.getElementById("loadingOverlay").style.display = "none";
+  });
+</script>
+<script>
+  // Scroll Reveal Animasi
+  ScrollReveal().reveal('.boxed-section', {
+    duration: 1000,
+    distance: '50px',
+    origin: 'bottom',
+    easing: 'ease-in-out',
+    reset: false
+  });
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+<script src="script.js"></script>
+</body>
+</html>
