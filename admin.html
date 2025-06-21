@@ -91,20 +91,30 @@
       }
     }
 
-    function kirimNotifikasi(id) {
-      db.ref("pelanggan/" + id).once("value").then(snap => {
-        const data = snap.val();
-        const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
-        db.ref("notifikasi/" + id).push({
-          nama: data.nama,
-          paket: data.paket,
-          harga: data.harga,
-          waktu: new Date().toLocaleString('id-ID'),
-          pesan: pesan,
-          status: 'belum dibaca'
-        }).then(() => alert("Notifikasi dikirim!"));
-      });
-    }
+    function kirimNotifikasi(idPelanggan) {
+  const ref = firebase.database().ref("pelanggan/" + idPelanggan);
+  ref.once("value").then((snapshot) => {
+    if (!snapshot.exists()) return alert("Pelanggan tidak ditemukan.");
+
+    const data = snapshot.val();
+    const waktu = new Date().toLocaleString('id-ID');
+    const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
+
+    // Simpan notifikasi ke notifikasi/{telepon}
+    firebase.database().ref("notifikasi/" + data.telepon).push({
+      nama: data.nama,
+      paket: data.paket,
+      harga: data.harga,
+      waktu: waktu,
+      pesan: pesan,
+      status: "belum dibaca"
+    }).then(() => {
+      alert("📩 Notifikasi dikirim ke pelanggan!");
+    }).catch((err) => {
+      alert("❌ Gagal mengirim notifikasi: " + err.message);
+    });
+  });
+}
 
     // MODAL KONFIRMASI
     function bukaModalKonfirmasi() {
