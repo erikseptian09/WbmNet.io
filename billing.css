@@ -1,66 +1,103 @@
-/* Reset dan font dasar */
+/* Reset & base font */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background-color: #f7f9fc;
+  background-color: #f4f6f9;
   color: #333;
   padding: 20px;
 }
 
+/* Container */
 .container {
-  max-width: 700px;
+  max-width: 800px;
   margin: auto;
-  background: #ffffff;
+  background: #fff;
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
 }
 
-h1, h2 {
+/* Wrapper untuk tabel agar scroll horizontal jika melebar */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+/* Gaya tabel */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+table th, table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Untuk tombol dalam kolom aksi */
+td button {
+  margin-right: 5px;
+}
+
+/* Heading */
+h1, h2, h3 {
   text-align: center;
   color: #1a73e8;
   margin-bottom: 20px;
 }
 
-p {
-  margin-bottom: 15px;
-  font-size: 16px;
-}
-
-input[type="text"], input[type="file"] {
+/* Input & Select */
+input[type="text"],
+input[type="file"],
+select {
   width: 100%;
   padding: 12px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 15px;
-  transition: border 0.2s ease-in-out;
+  transition: border-color 0.2s ease;
 }
 
 input[type="text"]:focus,
-input[type="file"]:focus {
+input[type="file"]:focus,
+select:focus {
   border-color: #1a73e8;
   outline: none;
 }
 
+/* Buttons */
 button {
   padding: 12px 24px;
   background-color: #1a73e8;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin-top: 5px;
 }
 
 button:hover {
-  background-color: #0b59c7;
+  background-color: #0c59c1;
 }
 
 button:disabled {
@@ -68,41 +105,102 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Gaya tampilan bukti transfer */
-img {
-  margin-top: 10px;
-  max-width: 100%;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-/* Admin panel item */
-#list > div {
-  background-color: #f9fbff;
-  padding: 20px;
-  border: 1px solid #dfe3e8;
-  border-radius: 8px;
+/* Rekening info */
+#rekeningInfo {
+  display: none;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  background: #f1f4f9;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #d0d7e2;
 }
 
-hr {
-  margin-top: 20px;
-  border: 0;
-  border-top: 1px solid #e0e0e0;
+#rekeningInfo p {
+  margin: 5px 0;
 }
 
-/* Responsif */
+/* Notifikasi List */
+.notifikasi-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fcfdff;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notifikasi-list li {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.notifikasi-list li:last-child {
+  border-bottom: none;
+}
+
+.notifikasi-list hr {
+  margin: 8px 0;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 8% auto;
+  padding: 20px 30px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: #1a73e8;
+}
+
+.close {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
   .container {
     padding: 20px;
   }
 
-  h2 {
+  h2, h3 {
     font-size: 20px;
   }
 
-  input, button {
+  button {
+    width: 100%;
     font-size: 14px;
+  }
+
+  input, select {
+    font-size: 14px;
+  }
+
+  .modal-content {
+    padding: 20px;
   }
 }
