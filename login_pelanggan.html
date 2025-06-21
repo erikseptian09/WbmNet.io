@@ -17,19 +17,29 @@
 
   <script>
     function loginPelanggan() {
-      const nohp = document.getElementById("nohp").value;
-      if (!nohp) return alert("Masukkan No HP");
+  const nohp = document.getElementById("nohp").value.trim();
+  if (!nohp) return alert("Masukkan nomor HP");
 
-      firebase.database().ref("pelanggan/" + nohp).once("value", (snap) => {
-        if (snap.exists()) {
-          localStorage.setItem("nohp", nohp);
-          localStorage.setItem("nama", snap.val().nama || "");
-          window.location.href = "pelanggan.html";
-        } else {
-          alert("Nomor tidak terdaftar.");
-        }
-      });
+  firebase.database().ref("pelanggan").once("value").then(snapshot => {
+    let ditemukan = false;
+
+    snapshot.forEach(child => {
+      const data = child.val();
+      if (data.telepon === nohp || data.telepon === '62' + nohp.slice(1)) {
+        // Simpan data pelanggan ke localStorage
+        localStorage.setItem("nohp", data.telepon);
+        localStorage.setItem("nama", data.nama);
+        localStorage.setItem("idPelanggan", data.idPelanggan);
+        ditemukan = true;
+        window.location.href = "pelanggan.html";
+      }
+    });
+
+    if (!ditemukan) {
+      alert("Nomor tidak ditemukan. Pastikan nomor sesuai.");
     }
+  });
+}
   </script>
 </body>
 </html>
