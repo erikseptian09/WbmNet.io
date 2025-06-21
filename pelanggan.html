@@ -8,15 +8,63 @@
 <body>
   <div class="container">
     <h2>Selamat Datang, <span id="namaPelanggan"></span></h2>
-    <p>Silakan transfer ke rekening berikut:</p>
-    <b>Bank BCA - 1234567890 a.n. Nama Anda</b>
-    <p>Setelah transfer, upload bukti di bawah:</p>
+<h3>Pilih Rekening Tujuan:</h3>
+<select id="rekeningSelect" onchange="tampilkanRekening()">
+  <option value="" disabled selected>-- Pilih Rekening --</option>
+  <option value="BCA">BCA</option>
+  <option value="BRI">BRI</option>
+  <option value="MANDIRI">MANDIRI</option>
+  <option value="DANA">DANA</option>
+</select>
+
+<div id="rekeningInfo" style="margin-top: 10px; display: none;">
+  <p><b>Nomor Rekening: <span id="nomorRekening"></span></b></p>
+<p><small>a.n. <span id="namaRekening"></span></small></p>
+<button onclick="salinRekening()">📋 Salin Nomor</button>
+</div>
+
     <input type="file" id="bukti">
     <button onclick="uploadBukti()">Upload Bukti</button>
-  </div>
+
+  
+   <h3>Notifikasi Anda</h3>
+    <ul id="listNotifikasi" class="notifikasi-list"></ul>
+    </div>
 
   <script src="config.js"></script>
   <script>
+    
+    const daftarRekening = {
+  BCA: { nomor: "6880777741", nama: "Asep Jaelani"},
+  BRI: { nomor: "084701025669538", nama: "Asep Jaelani"},
+  MANDIRI: { nomor: "1560017886260", nama: "EUIS JUBAEDAH"},
+  DANA: { nomor: "083895300118", nama: "ASEP JAELANI"}
+};
+
+function tampilkanRekening() {
+  const bank = document.getElementById("rekeningSelect").value;
+  const info = document.getElementById("rekeningInfo");
+  const nomor = document.getElementById("nomorRekening");
+  const nama = document.getElementById("namaRekening");
+
+  if (daftarRekening[bank]) {
+    nomor.textContent = daftarRekening[bank].nomor;
+    nama.textContent = daftarRekening[bank].nama;
+    info.style.display = "block";
+  } else {
+    info.style.display = "none";
+  }
+}
+
+function salinRekening() {
+  const teks = document.getElementById("nomorRekening").textContent;
+  navigator.clipboard.writeText(teks).then(() => {
+    alert("✅ Nomor rekening disalin!");
+  }).catch(err => {
+    alert("❌ Gagal menyalin");
+  });
+}
+
     const nama = localStorage.getItem("nama");
     const nohp = localStorage.getItem("nohp");
     document.getElementById("namaPelanggan").textContent = nama;
@@ -38,6 +86,21 @@
         });
       });
     }
+    
+    const listNotifikasi = document.getElementById("listNotifikasi");
+    firebase.database().ref("notifikasi/" + nohp).on("value", snapshot => {
+      listNotifikasi.innerHTML = "";
+      if (snapshot.exists()) {
+        snapshot.forEach(child => {
+          const data = child.val();
+          const li = document.createElement("li");
+          li.innerHTML = `<b>${data.waktu}</b><br>${data.pesan}<hr>`;
+          listNotifikasi.appendChild(li);
+        });
+      } else {
+        listNotifikasi.innerHTML = "<li>Tidak ada notifikasi.</li>";
+      }
+    });
   </script>
 </body>
 </html>
