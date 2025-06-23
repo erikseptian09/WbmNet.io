@@ -11,6 +11,10 @@
   <div class="container">
     <h2>Dashboard Admin</h2>
 
+    <button onclick="kirimNotifikasiMassal()" class="aksi-btn notif">
+  <i class="fas fa-bell"></i> Kirim Notifikasi ke Semua
+</button>
+
     <input type="text" id="searchInput" placeholder="🔍 Cari pelanggan...">
   
     <div class="table-wrapper">
@@ -112,6 +116,39 @@
       alert("📩 Notifikasi dikirim ke pelanggan!");
     }).catch((err) => {
       alert("❌ Gagal mengirim notifikasi: " + err.message);
+    });
+  });
+}
+
+    function kirimNotifikasiMassal() {
+  if (!confirm("Kirim notifikasi ke semua pelanggan?")) return;
+
+  db.ref("pelanggan").once("value").then(snapshot => {
+    if (!snapshot.exists()) return alert("Tidak ada data pelanggan.");
+
+    const waktu = new Date().toLocaleString('id-ID');
+    const promises = [];
+
+    snapshot.forEach(child => {
+      const data = child.val();
+      const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
+
+      const notifikasiRef = db.ref("notifikasi/" + data.telepon).push();
+      const prom = notifikasiRef.set({
+        nama: data.nama,
+        paket: data.paket,
+        harga: data.harga,
+        waktu: waktu,
+        pesan: pesan,
+        status: "belum dibaca"
+      });
+      promises.push(prom);
+    });
+
+    Promise.all(promises).then(() => {
+      alert("✅ Notifikasi berhasil dikirim ke semua pelanggan.");
+    }).catch(err => {
+      alert("❌ Gagal mengirim notifikasi ke semua: " + err.message);
     });
   });
 }
