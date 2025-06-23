@@ -105,6 +105,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.aksi-btn.notif {
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin: 6px 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 /* Rekening info */
 #rekeningInfo {
   display: none;
