@@ -3,9 +3,9 @@
   "short_name": "Wbm.Net",
   "start_url": "loader.html",
   "display": "standalone",
-  "background_color": "#0ec7e7",
-  "theme_color": "#0d6efd",
-  "description": "Aplikasi Wibawamulia.Network",
+  "background_color": "#ffffff",
+  "theme_color": "#4caf50",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
