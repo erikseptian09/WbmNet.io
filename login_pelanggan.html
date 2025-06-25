@@ -27,7 +27,7 @@
       .then(snapshot => {
         if (snapshot.exists()) {
           localStorage.setItem('nohp', nohp);
-          window.location.href = 'dashboard_pelanggan.html';
+          window.location.href = 'pelanggan.html';
         } else {
           document.getElementById('loginError').innerText = 'Nomor HP tidak ditemukan di data pelanggan.';
         }
