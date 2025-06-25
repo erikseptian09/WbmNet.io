@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,28 +11,25 @@
 <body>
   <div class="container">
     <h2>Dashboard Admin</h2>
-
     <input type="text" id="searchInput" placeholder="🔍 Cari pelanggan...">
-  
     <div class="table-wrapper">
-    <table id="tabelPelanggan">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Telepon</th>
-          <th>Paket</th>
-          <th>Harga</th>
-          <th>Keterangan</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+      <table id="tabelPelanggan">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Telepon</th>
+            <th>Paket</th>
+            <th>Harga</th>
+            <th>Keterangan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Modal Konfirmasi Pembayaran -->
   <div id="modalKonfirmasi" class="modal">
     <div class="modal-content">
       <span class="close" onclick="tutupModalKonfirmasi()">&times;</span>
@@ -42,17 +40,25 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="config.js"></script>
   <script>
     const db = firebase.database();
     const tbody = document.querySelector("#tabelPelanggan tbody");
     const searchInput = document.getElementById("searchInput");
-    
 
-    // Tampilkan pelanggan
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user && user.email === 'wbmnet2020@gmail.com') {
+        tampilkanPelanggan();
+      } else {
+        alert("Silakan login sebagai admin terlebih dahulu.");
+        window.location.href = "login_admin.html";
+      }
+    });
+
     function tampilkanPelanggan() {
       tbody.innerHTML = "";
-      db.ref("pelanggan").once("value").then(snapshot => {
+      db.ref("pelanggan/aktif").once("value").then(snapshot => {
         let no = 1;
         snapshot.forEach(child => {
           const id = child.key;
@@ -66,10 +72,10 @@
             <td>${data.harga}</td>
             <td>${data.keterangan}</td>
             <td>
-              <button class="aksi-btn edit" onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
-              <button class="aksi-btn hapus" onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
-              <button class="aksi-btn notif" onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
-              <button class="aksi-btn konfirmasi" onclick="bukaModalKonfirmasi()"><i class="fas fa-check-circle"></i></button>
+              <button onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
+              <button onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
+              <button onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
+              <button onclick="konfirmasiBayar('${id}')"><i class="fas fa-check-circle"></i></button>
             </td>
           `;
           tbody.appendChild(row);
@@ -78,113 +84,50 @@
     }
 
     function editPelanggan(id) {
-      alert("Edit pelanggan: " + id);
+      const namaBaru = prompt("Masukkan nama baru:");
+      if (namaBaru) {
+        db.ref("pelanggan/aktif/" + id + "/nama").set(namaBaru).then(tampilkanPelanggan);
+      }
     }
 
     function hapusPelanggan(id) {
       if (confirm("Yakin ingin menghapus pelanggan ini?")) {
-        db.ref("pelanggan/" + id).remove().then(() => {
+        db.ref("pelanggan/aktif/" + id).remove().then(() => {
           alert("Pelanggan dihapus!");
           tampilkanPelanggan();
         });
       }
     }
 
-    function kirimNotifikasi(idPelanggan) {
-  const ref = firebase.database().ref("pelanggan/" + idPelanggan);
-  ref.once("value").then((snapshot) => {
-    if (!snapshot.exists()) return alert("Pelanggan tidak ditemukan.");
+    function kirimNotifikasi(id) {
+      db.ref("pelanggan/aktif/" + id).once("value").then(snapshot => {
+        const data = snapshot.val();
+        const waktu = new Date().toLocaleString('id-ID');
+        const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
 
-    const data = snapshot.val();
-    const waktu = new Date().toLocaleString('id-ID');
-    const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
+        db.ref("notifikasi/" + data.telepon).push({
+          nama: data.nama, paket: data.paket, harga: data.harga,
+          waktu: waktu, pesan: pesan, status: "belum dibaca"
+        }).then(() => alert("📩 Notifikasi dikirim!"));
+      });
+    }
 
-    // Simpan notifikasi ke notifikasi/{telepon}
-    firebase.database().ref("notifikasi/" + data.telepon).push({
-      nama: data.nama,
-      paket: data.paket,
-      harga: data.harga,
-      waktu: waktu,
-      pesan: pesan,
-      status: "belum dibaca"
-    }).then(() => {
-      alert("📩 Notifikasi dikirim ke pelanggan!");
-    }).catch((err) => {
-      alert("❌ Gagal mengirim notifikasi: " + err.message);
-    });
-  });
-}
-
-    // MODAL KONFIRMASI
-    function bukaModalKonfirmasi() {
-      document.getElementById("modalKonfirmasi").style.display = "block";
-      tampilkanDaftarKonfirmasi();
+    function konfirmasiBayar(id) {
+      db.ref("pelanggan/aktif/" + id).once("value").then(snapshot => {
+        const data = snapshot.val();
+        db.ref("pelanggan/lunas/" + id).set(data).then(() => {
+          db.ref("pelanggan/aktif/" + id).remove().then(() => {
+            alert("✅ Pembayaran dikonfirmasi.");
+            tampilkanPelanggan();
+          });
+        });
+      });
     }
 
     function tutupModalKonfirmasi() {
       document.getElementById("modalKonfirmasi").style.display = "none";
     }
 
-async function loadKonfirmasiPembayaran() {
-  try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbyYmfAKykfaDARjWk_zbXf9QkMQyrfOYGcYUrKnnFN_NF0jObVsZHjspDq9WyK72vYWEQ/exec");
-    const data = await response.json();
-
-    const tbody = document.getElementById("daftarKonfirmasi");
-    tbody.innerHTML = "";
-
-    data.forEach(item => {
-      const row = document.createElement("tr");
-
-      // tampilkan thumbnail bukti (base64 image)
-      const imgHTML = item.bukti.startsWith("data:image")
-        ? `<img src="${item.bukti}" alt="Bukti" width="60" style="cursor:pointer" onclick="bukaGambar('${item.bukti}')">`
-        : `<a href="${item.bukti}" target="_blank">Lihat</a>`;
-
-      row.innerHTML = `
-        <td>${item.nama}</td>
-        <td>${item.nohp}</td>
-        <td>${item.paket}</td>
-        <td>${item.harga}</td>
-        <td>${item.waktu}</td>
-        <td>${imgHTML}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  } catch (error) {
-    console.error("Gagal ambil data:", error);
-  }
-}
-
-// Fungsi untuk memperbesar gambar saat diklik
-function bukaGambar(src) {
-  const win = window.open();
-  win.document.write(`<img src="${src}" style="width:100%">`);
-}
-
-    function konfirmasiPembayaran(id) {
-      db.ref("konfirmasi/" + id).once("value").then(snap => {
-        const data = snap.val();
-
-        db.ref("pelanggan/lunas/" + id).set(data);
-        db.ref("pelanggan/aktif/" + id).remove();
-        db.ref("konfirmasi/" + id).remove();
-
-        alert("Pembayaran dikonfirmasi.");
-        tampilkanDaftarKonfirmasi();
-      });
-    }
-
-    function tolakPembayaran(id) {
-      if (confirm("Tolak bukti pembayaran ini?")) {
-        db.ref("konfirmasi/" + id).remove().then(() => {
-          alert("Konfirmasi ditolak.");
-          tampilkanDaftarKonfirmasi();
-        });
-      }
-    }
-
-    // FITUR SEARCH
     searchInput.addEventListener("input", () => {
       const keyword = searchInput.value.toLowerCase();
       const rows = tbody.querySelectorAll("tr");
