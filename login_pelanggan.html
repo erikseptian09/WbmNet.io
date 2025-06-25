@@ -14,17 +14,29 @@
 
   <script src="config.js"></script>
   <script>
-    function loginPelanggan() {
-      const nohp = document.getElementById('nohp').value;
-      firebase.database().ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
+  function loginPelanggan() {
+    const nohp = document.getElementById('nohp').value.trim();
+
+    if (!nohp) {
+      document.getElementById('loginError').innerText = 'Nomor HP tidak boleh kosong.';
+      return;
+    }
+
+    const db = firebase.database();
+    db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value')
+      .then(snapshot => {
         if (snapshot.exists()) {
           localStorage.setItem('nohp', nohp);
-          window.location.href = 'pelanggan.html';
+          window.location.href = 'dashboard_pelanggan.html';
         } else {
-          document.getElementById('loginError').innerText = 'Nomor HP tidak ditemukan.';
+          document.getElementById('loginError').innerText = 'Nomor HP tidak ditemukan di data pelanggan.';
         }
+      })
+      .catch(error => {
+        console.error('Login Error:', error);
+        document.getElementById('loginError').innerText = 'Terjadi kesalahan saat login.';
       });
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
