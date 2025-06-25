@@ -35,7 +35,7 @@
           const data = child.val();
           if (data.telepon === nohp) {
             ditemukan = true;
-            localStorage.setItem("pelangganID", child.key); // Simpan ID jika perlu
+            localStorage.setItem("nohp", child.key); // Simpan ID jika perlu
             window.location.href = "pelanggan.html";
           }
         });
