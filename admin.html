@@ -48,14 +48,6 @@
     const tbody = document.querySelector("#tabelPelanggan tbody");
     const searchInput = document.getElementById("searchInput");
     
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user && user.email === 'wbmnet2020@gmail.com') {
-      tampilkanPelanggan(); // Hanya tampilkan data jika admin login
-    } else {
-      alert("Silakan login sebagai admin terlebih dahulu.");
-      window.location.href = "login_admin.html";
-    }
-  });
 
     // Tampilkan pelanggan
     function tampilkanPelanggan() {
@@ -84,8 +76,6 @@
         });
       });
     }
-
-    tampilkanPelanggan(); // <-- Jangan dipanggil langsung sebelum login dicek
 
     function editPelanggan(id) {
       alert("Edit pelanggan: " + id);
