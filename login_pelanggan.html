@@ -1,50 +1,28 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login Pelanggan</title>
-  <link rel="stylesheet" href="billing.css" />
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="config.js"></script>
+  <link rel="stylesheet" href="billing.css">
 </head>
 <body>
-  <div class="container" style="max-width:400px; margin:auto; padding:30px;">
-    <h2 style="text-align:center">Login Pelanggan</h2>
-    <input type="text" id="nohp" placeholder="Masukkan No. HP" style="width:100%; padding:10px; margin:10px 0;">
-    <button onclick="loginPelanggan()" style="width:100%; padding:10px; background:#28a745; color:white;">Login</button>
-    <p id="errorMsg" style="color:red; text-align:center; margin-top:10px;"></p>
+  <div class="container">
+    <h2>Login Pelanggan</h2>
+    <input type="text" id="nohp" placeholder="Masukkan Nomor HP" />
+    <button onclick="loginPelanggan()">Login</button>
+    <p id="loginError" class="error"></p>
   </div>
 
+  <script src="config.js"></script>
   <script>
     function loginPelanggan() {
-      const nohp = document.getElementById("nohp").value.trim();
-      const errorMsg = document.getElementById("errorMsg");
-
-      if (!nohp) {
-        errorMsg.textContent = "⚠️ Silakan masukkan nomor HP.";
-        return;
-      }
-
-      // Cek ke database pelanggan
-      firebase.database().ref("pelanggan").once("value").then(snapshot => {
-        let ditemukan = false;
-
-        snapshot.forEach(child => {
-          const data = child.val();
-          if (data.telepon === nohp) {
-            ditemukan = true;
-            localStorage.setItem("nohp", child.key); // Simpan ID jika perlu
-            window.location.href = "pelanggan.html";
-          }
-        });
-
-        if (!ditemukan) {
-          errorMsg.textContent = "❌ Nomor HP tidak ditemukan. Pastikan sudah terdaftar.";
+      const nohp = document.getElementById('nohp').value;
+      firebase.database().ref('pelanggan/aktif').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
+        if (snapshot.exists()) {
+          localStorage.setItem('nohp', nohp);
+          window.location.href = 'dashboard_pelanggan.html';
+        } else {
+          document.getElementById('loginError').innerText = 'Nomor HP tidak ditemukan.';
         }
-      }).catch(error => {
-        errorMsg.textContent = "❌ Gagal mengakses database: " + error.message;
       });
     }
   </script>
