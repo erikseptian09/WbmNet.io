@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="billing.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="config.js"></script>
+  <script src="firebase-config.js"></script>
 </head>
 <body>
   <div class="container">
@@ -17,24 +17,19 @@
   </div>
 
   <script>
-  function loginAdmin() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+    function loginAdmin() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-  if (!email || !password) {
-    alert("Email dan Password wajib diisi.");
-    return;
+      firebase.auth().onAuthStateChanged(function(user) {
+  if (user && user.email === 'wbmnet2020@gmail.com') {
+    tampilkanPelanggan(); // hanya di sini
+  } else {
+    alert("Silakan login sebagai admin terlebih dahulu.");
+    window.location.href = "login_admin.html";
   }
-
-  firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(() => {
-      alert("Login berhasil!");
-      window.location.href = "admin.html";
-    })
-    .catch(error => {
-      alert("Login gagal: " + error.message);
-    });
-}
-</script>
+});
+    }
+  </script>
 </body>
 </html>
