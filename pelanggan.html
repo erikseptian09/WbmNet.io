@@ -19,8 +19,10 @@
       <option value="QRIS - Scan QR Code">QRIS - Scan QR Code</option>
     </select>
 
-    <textarea id="keterangan" placeholder="Contoh: Transfer via BRImo, atas nama..."></textarea>
-
+<div id="qrisContainer" style="display: none; margin-top: 15px;">
+  <h4>Silakan Scan QRIS</h4>
+  <img src="img/qris.jpg" alt="QRIS" style="max-width: 300px;" />
+</div>
     <label for="bukti">Upload Bukti Pembayaran:</label>
     <input type="file" id="bukti" accept="image/*,application/pdf" />
 
@@ -57,6 +59,17 @@
         document.getElementById('status').innerText = 'Pilih rekening tujuan terlebih dahulu.';
         return;
       }
+
+  function cekMetode() {
+    const metode = document.getElementById("metode").value;
+    const qris = document.getElementById("qrisContainer");
+
+    if (metode === "qris") {
+      qris.style.display = "block";
+    } else {
+      qris.style.display = "none";
+    }
+  }
 
       if (!keterangan || !buktiFile) {
         document.getElementById('status').innerText = 'Lengkapi keterangan dan upload bukti pembayaran.';
