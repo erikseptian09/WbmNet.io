@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Login Pelanggan</title>
   <link rel="stylesheet" href="billing.css">
 </head>
@@ -9,34 +10,34 @@
     <h2>Login Pelanggan</h2>
     <input type="text" id="nohp" placeholder="Masukkan Nomor HP" />
     <button onclick="loginPelanggan()">Login</button>
-    <p id="loginError" class="error"></p>
+    <p id="loginError" class="error" style="color: red;"></p>
   </div>
 
   <script src="config.js"></script>
   <script>
-  function loginPelanggan() {
-    const nohp = document.getElementById('nohp').value.trim();
+    function loginPelanggan() {
+      const nohp = document.getElementById('nohp').value.trim();
 
-    if (!nohp) {
-      document.getElementById('loginError').innerText = 'Nomor HP tidak boleh kosong.';
-      return;
+      if (!nohp) {
+        document.getElementById('loginError').innerText = '⚠️ Nomor HP wajib diisi.';
+        return;
+      }
+
+      const db = firebase.database();
+      db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value')
+        .then(snapshot => {
+          if (snapshot.exists()) {
+            localStorage.setItem('nohp', nohp);
+            window.location.href = 'pelanggan.html';
+          } else {
+            document.getElementById('loginError').innerText = '❌ Nomor HP tidak ditemukan.';
+          }
+        })
+        .catch(error => {
+          console.error('Login Error:', error);
+          document.getElementById('loginError').innerText = '❌ Terjadi kesalahan saat login.';
+        });
     }
-
-    const db = firebase.database();
-    db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value')
-      .then(snapshot => {
-        if (snapshot.exists()) {
-          localStorage.setItem('nohp', nohp);
-          window.location.href = 'pelanggan.html';
-        } else {
-          document.getElementById('loginError').innerText = 'Nomor HP tidak ditemukan di data pelanggan.';
-        }
-      })
-      .catch(error => {
-        console.error('Login Error:', error);
-        document.getElementById('loginError').innerText = 'Terjadi kesalahan saat login.';
-      });
-  }
-</script>
+  </script>
 </body>
 </html>
