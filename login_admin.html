@@ -1,34 +1,43 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Admin</title>
   <link rel="stylesheet" href="billing.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <script src="config.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h2>Login Admin</h2>
-    <input type="email" id="email" placeholder="Email Admin">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="loginAdmin()">Login</button>
+  <div class="container" style="max-width: 400px; margin: auto; padding: 30px;">
+    <h2 style="text-align:center">Login Admin</h2>
+    <input type="email" id="email" placeholder="Email Admin" required style="width:100%; padding:10px; margin:10px 0;">
+    <input type="password" id="password" placeholder="Password" required style="width:100%; padding:10px; margin:10px 0;">
+    <button onclick="loginAdmin()" style="width:100%; padding:10px; background:#007bff; color:white; border:none;">Login</button>
+    <p id="errorMsg" style="color:red; text-align:center; margin-top:10px;"></p>
   </div>
 
   <script>
     function loginAdmin() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("errorMsg");
 
-      firebase.auth().onAuthStateChanged(function(user) {
-  if (user && user.email === 'wbmnet2020@gmail.com') {
-    tampilkanPelanggan(); // hanya di sini
-  } else {
-    alert("Silakan login sebagai admin terlebih dahulu.");
-    window.location.href = "login_admin.html";
-  }
-});
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          if (user.email === 'wbmnet2020@gmail.com') {
+            window.location.href = "admin.html";
+          } else {
+            firebase.auth().signOut();
+            errorMsg.textContent = "❌ Email ini bukan admin yang diizinkan.";
+          }
+        })
+        .catch(error => {
+          errorMsg.textContent = "❌ " + error.message;
+        });
     }
   </script>
 </body>
