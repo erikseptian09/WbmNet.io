@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <title>Login Pelanggan</title>
   <link rel="stylesheet" href="billing.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
   <div class="container">
@@ -17,42 +20,41 @@
 
   <script src="config.js"></script>
   <script>
-  function loginPelanggan() {
-    const nohp = document.getElementById('nohp').value.trim();
-    console.log("Nomor yang dimasukkan:", nohp);
+    function loginPelanggan() {
+      const nohp = document.getElementById('nohp').value.trim();
+      const loginError = document.getElementById('loginError');
+      loginError.innerText = '';
 
-    if (!nohp) {
-      document.getElementById('loginError').innerText = '⚠️ Nomor HP wajib diisi.';
-      return;
-    }
+      if (!nohp) {
+        loginError.innerText = '⚠️ Nomor HP wajib diisi.';
+        return;
+      }
 
-    const db = firebase.database();
-    db.ref('pelanggan').once('value')
-      .then(snapshot => {
-        let ditemukan = false;
+      const db = firebase.database();
+      db.ref('pelanggan').once('value')
+        .then(snapshot => {
+          let ditemukan = false;
 
-        snapshot.forEach(child => {
-          const data = child.val();
-          if (data.telepon === nohp) {
-            console.log("Ditemukan:", data);
-            localStorage.setItem('nohp', nohp);
-            window.location.href = 'pelanggan.html';
-            ditemukan = true;
-            return true; // stop loop
+          snapshot.forEach(child => {
+            const data = child.val();
+            if (data.telepon === nohp) {
+              // Simpan ke localStorage
+              localStorage.setItem('nohp', nohp);
+              window.location.href = 'pelanggan.html';
+              ditemukan = true;
+              return true; // keluar dari forEach
+            }
+          });
+
+          if (!ditemukan) {
+            loginError.innerText = '❌ Nomor HP tidak ditemukan.';
           }
+        })
+        .catch(error => {
+          console.error('Firebase Error:', error);
+          loginError.innerText = '❌ Terjadi kesalahan saat login.';
         });
-
-        if (!ditemukan) {
-          console.warn("Nomor tidak ditemukan di database");
-          document.getElementById('loginError').innerText = '❌ Nomor HP tidak ditemukan.';
-        }
-      })
-      .catch(error => {
-        console.error('Firebase Error:', error);
-        document.getElementById('loginError').innerText = '❌ Terjadi kesalahan saat login.';
-      });
-  }
-</script>
-  
+    }
+  </script>
 </body>
 </html>
