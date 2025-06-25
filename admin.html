@@ -11,10 +11,6 @@
   <div class="container">
     <h2>Dashboard Admin</h2>
 
-    <button onclick="kirimNotifikasiMassal()" class="aksi-btn notif">
-  <i class="fas fa-bell"></i> Kirim Notifikasi ke Semua
-</button>
-
     <input type="text" id="searchInput" placeholder="🔍 Cari pelanggan...">
   
     <div class="table-wrapper">
@@ -51,6 +47,15 @@
     const db = firebase.database();
     const tbody = document.querySelector("#tabelPelanggan tbody");
     const searchInput = document.getElementById("searchInput");
+    
+  firebase.auth().onAuthStateChanged(function(user) {
+    if (user && user.email === 'wbmnet2020@gmail.com') {
+      tampilkanPelanggan(); // Hanya tampilkan data jika admin login
+    } else {
+      alert("Silakan login sebagai admin terlebih dahulu.");
+      window.location.href = "login_admin.html";
+    }
+  });
 
     // Tampilkan pelanggan
     function tampilkanPelanggan() {
@@ -80,7 +85,7 @@
       });
     }
 
-    tampilkanPelanggan();
+    tampilkanPelanggan(); // <-- Jangan dipanggil langsung sebelum login dicek
 
     function editPelanggan(id) {
       alert("Edit pelanggan: " + id);
@@ -120,39 +125,6 @@
   });
 }
 
-    function kirimNotifikasiMassal() {
-  if (!confirm("Kirim notifikasi ke semua pelanggan?")) return;
-
-  db.ref("pelanggan").once("value").then(snapshot => {
-    if (!snapshot.exists()) return alert("Tidak ada data pelanggan.");
-
-    const waktu = new Date().toLocaleString('id-ID');
-    const promises = [];
-
-    snapshot.forEach(child => {
-      const data = child.val();
-      const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
-
-      const notifikasiRef = db.ref("notifikasi/" + data.telepon).push();
-      const prom = notifikasiRef.set({
-        nama: data.nama,
-        paket: data.paket,
-        harga: data.harga,
-        waktu: waktu,
-        pesan: pesan,
-        status: "belum dibaca"
-      });
-      promises.push(prom);
-    });
-
-    Promise.all(promises).then(() => {
-      alert("✅ Notifikasi berhasil dikirim ke semua pelanggan.");
-    }).catch(err => {
-      alert("❌ Gagal mengirim notifikasi ke semua: " + err.message);
-    });
-  });
-}
-
     // MODAL KONFIRMASI
     function bukaModalKonfirmasi() {
       document.getElementById("modalKonfirmasi").style.display = "block";
@@ -163,7 +135,7 @@
       document.getElementById("modalKonfirmasi").style.display = "none";
     }
 
-    async function loadKonfirmasiPembayaran() {
+async function loadKonfirmasiPembayaran() {
   try {
     const response = await fetch("https://script.google.com/macros/s/AKfycbyYmfAKykfaDARjWk_zbXf9QkMQyrfOYGcYUrKnnFN_NF0jObVsZHjspDq9WyK72vYWEQ/exec");
     const data = await response.json();
@@ -192,6 +164,12 @@
   } catch (error) {
     console.error("Gagal ambil data:", error);
   }
+}
+
+// Fungsi untuk memperbesar gambar saat diklik
+function bukaGambar(src) {
+  const win = window.open();
+  win.document.write(`<img src="${src}" style="width:100%">`);
 }
 
     function konfirmasiPembayaran(id) {
