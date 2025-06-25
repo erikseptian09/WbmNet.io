@@ -58,7 +58,7 @@
 
     function tampilkanPelanggan() {
       tbody.innerHTML = "";
-      db.ref("pelanggan/aktif").once("value").then(snapshot => {
+      db.ref("pelanggan").once("value").then(snapshot => {
         let no = 1;
         snapshot.forEach(child => {
           const id = child.key;
