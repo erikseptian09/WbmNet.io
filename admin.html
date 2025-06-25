@@ -86,13 +86,13 @@
     function editPelanggan(id) {
       const namaBaru = prompt("Masukkan nama baru:");
       if (namaBaru) {
-        db.ref("pelanggan/aktif/" + id + "/nama").set(namaBaru).then(tampilkanPelanggan);
+        db.ref("pelanggan" + id + "/nama").set(namaBaru).then(tampilkanPelanggan);
       }
     }
 
     function hapusPelanggan(id) {
       if (confirm("Yakin ingin menghapus pelanggan ini?")) {
-        db.ref("pelanggan/aktif/" + id).remove().then(() => {
+        db.ref("pelanggan" + id).remove().then(() => {
           alert("Pelanggan dihapus!");
           tampilkanPelanggan();
         });
@@ -100,12 +100,12 @@
     }
 
     function kirimNotifikasi(id) {
-      db.ref("pelanggan/aktif/" + id).once("value").then(snapshot => {
+      db.ref("pelanggan/" + id).once("value").then(snapshot => {
         const data = snapshot.val();
         const waktu = new Date().toLocaleString('id-ID');
         const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
 
-        db.ref("notifikasi/" + data.telepon).push({
+        db.ref("notifikasi" + data.telepon).push({
           nama: data.nama, paket: data.paket, harga: data.harga,
           waktu: waktu, pesan: pesan, status: "belum dibaca"
         }).then(() => alert("📩 Notifikasi dikirim!"));
@@ -113,7 +113,7 @@
     }
 
     function konfirmasiBayar(id) {
-      db.ref("pelanggan/aktif/" + id).once("value").then(snapshot => {
+      db.ref("pelanggan" + id).once("value").then(snapshot => {
         const data = snapshot.val();
         db.ref("pelanggan/lunas/" + id).set(data).then(() => {
           db.ref("pelanggan/aktif/" + id).remove().then(() => {
