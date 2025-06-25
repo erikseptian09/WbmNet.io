@@ -21,18 +21,14 @@
   <script src="config.js"></script>
   <script>
   function loginPelanggan() {
-    let nohp = document.getElementById('nohp').value.trim();
+    const nohpInput = document.getElementById('nohp');
+    const nohp = nohpInput.value.trim();
     const loginError = document.getElementById('loginError');
     loginError.innerText = '';
 
     if (!nohp) {
       loginError.innerText = '⚠️ Nomor HP wajib diisi.';
       return;
-    }
-
-    // Normalisasi nomor: jika mulai dengan 08 -> ubah ke +62
-    if (nohp.startsWith('08')) {
-      nohp = '+62' + nohp.slice(1);
     }
 
     const db = firebase.database();
@@ -42,10 +38,10 @@
 
         snapshot.forEach(child => {
           const data = child.val();
-          console.log("Cek nomor:", data.telepon);
+          console.log('Cek:', data.telepon);
 
           if (data.telepon === nohp) {
-            console.log("Login berhasil:", data);
+            console.log('Login berhasil:', data);
             localStorage.setItem('nohp', nohp);
             window.location.href = 'pelanggan.html';
             ditemukan = true;
@@ -58,7 +54,7 @@
         }
       })
       .catch(error => {
-        console.error('Firebase Error:', error);
+        console.error('Firebase error:', error);
         loginError.innerText = '❌ Terjadi kesalahan saat login.';
       });
   }
