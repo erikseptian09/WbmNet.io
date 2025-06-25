@@ -16,7 +16,7 @@
   <script>
     function loginPelanggan() {
       const nohp = document.getElementById('nohp').value;
-      firebase.database().ref('pelanggan/aktif').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
+      firebase.database().ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
         if (snapshot.exists()) {
           localStorage.setItem('nohp', nohp);
           window.location.href = 'pelanggan.html';
