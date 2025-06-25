@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memuat...</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    .progress-container {
+      width: 80%;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 20px;
+      width: 0%;
+      background-color: #4caf50;
+      transition: width 0.1s;
+    }
+
+    .loading-text {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="loading-text">Memuat aplikasi...</div>
+  </div>
+
+  <script>
+    let progress = 0;
+    const progressBar = document.getElementById('progressBar');
+
+    const loading = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress > 100) progress = 100;
+
+      progressBar.style.width = progress + '%';
+
+      if (progress === 100) {
+        clearInterval(loading);
+        // Tunggu sebentar lalu redirect ke index.html
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 500);
+      }
+    }, 100);
+  </script>
+</body>
+</html>
