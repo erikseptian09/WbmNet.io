@@ -1,7 +1,7 @@
 {
   "name": "Wibawamulia Network",
   "short_name": "Wbm.Net",
-  "start_url": "./index.html",
+  "start_url": "./loader.html",
   "display": "standalone",
   "background_color": "#0ec7e7",
   "theme_color": "#0d6efd",
