@@ -20,41 +20,48 @@
 
   <script src="config.js"></script>
   <script>
-    function loginPelanggan() {
-      const nohp = document.getElementById('nohp').value.trim();
-      const loginError = document.getElementById('loginError');
-      loginError.innerText = '';
+  function loginPelanggan() {
+    let nohp = document.getElementById('nohp').value.trim();
+    const loginError = document.getElementById('loginError');
+    loginError.innerText = '';
 
-      if (!nohp) {
-        loginError.innerText = '⚠️ Nomor HP wajib diisi.';
-        return;
-      }
-
-      const db = firebase.database();
-      db.ref('pelanggan').once('value')
-        .then(snapshot => {
-          let ditemukan = false;
-
-          snapshot.forEach(child => {
-            const data = child.val();
-            if (data.telepon === nohp) {
-              // Simpan ke localStorage
-              localStorage.setItem('nohp', nohp);
-              window.location.href = 'pelanggan.html';
-              ditemukan = true;
-              return true; // keluar dari forEach
-            }
-          });
-
-          if (!ditemukan) {
-            loginError.innerText = '❌ Nomor HP tidak ditemukan.';
-          }
-        })
-        .catch(error => {
-          console.error('Firebase Error:', error);
-          loginError.innerText = '❌ Terjadi kesalahan saat login.';
-        });
+    if (!nohp) {
+      loginError.innerText = '⚠️ Nomor HP wajib diisi.';
+      return;
     }
-  </script>
+
+    // Normalisasi nomor: jika mulai dengan 08 -> ubah ke +62
+    if (nohp.startsWith('08')) {
+      nohp = '+62' + nohp.slice(1);
+    }
+
+    const db = firebase.database();
+    db.ref('pelanggan').once('value')
+      .then(snapshot => {
+        let ditemukan = false;
+
+        snapshot.forEach(child => {
+          const data = child.val();
+          console.log("Cek nomor:", data.telepon);
+
+          if (data.telepon === nohp) {
+            console.log("Login berhasil:", data);
+            localStorage.setItem('nohp', nohp);
+            window.location.href = 'pelanggan.html';
+            ditemukan = true;
+            return true;
+          }
+        });
+
+        if (!ditemukan) {
+          loginError.innerText = '❌ Nomor HP tidak ditemukan.';
+        }
+      })
+      .catch(error => {
+        console.error('Firebase Error:', error);
+        loginError.innerText = '❌ Terjadi kesalahan saat login.';
+      });
+  }
+</script>
 </body>
 </html>
