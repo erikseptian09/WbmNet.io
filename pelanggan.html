@@ -2,154 +2,85 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard Pelanggan</title>
+  <title>Form Pembayaran Pelanggan</title>
   <link rel="stylesheet" href="billing.css">
 </head>
 <body>
   <div class="container">
-    <h2>Selamat Datang, <span id="namaPelanggan"></span></h2>
+    <h2>Formulir Pembayaran</h2>
 
-    <h3>Pilih Rekening Tujuan:</h3>
-    <select id="rekeningSelect" onchange="tampilkanRekening()">
-      <option value="" disabled selected>-- Pilih Rekening --</option>
-      <option value="BCA">BCA</option>
-      <option value="BRI">BRI</option>
-      <option value="MANDIRI">MANDIRI</option>
-      <option value="DANA">DANA</option>
+    <label for="rekening">Pilih Rekening Tujuan:</label>
+    <select id="rekening">
+      <option value="" disabled selected>-- Pilih Rekening Tujuan --</option>
+      <option value="BCA - 6880777741 a.n WBM NET">BCA - 6880777741 a.n Asep Jaelani</option>
+      <option value="BRI - 084701025669538 a.n WBM NET">BRI - 084701025669538 a.n Asep Jaelani</option>
+      <option value="MANDIRI - 1560017886260 a.n WBM NET">MANDIRI - 1560017886260 a.n EUIS JUBAEDAH</option>
+      <option value="DANA - 083895300118 a.n WBM NET">DANA - 083895300118 a.n ASEP JAELANI</option>
+      <option value="QRIS - Scan QR Code">QRIS - Scan QR Code</option>
     </select>
 
-    <div id="rekeningInfo" style="margin-top: 10px; display: none;">
-      <p><b>Nomor Rekening: <span id="nomorRekening"></span></b></p>
-      <p><small>a.n. <span id="namaRekening"></span></small></p>
-      <button onclick="salinRekening()">📋 Salin Nomor</button>
-    </div>
+    <textarea id="keterangan" placeholder="Contoh: Transfer via BRImo, atas nama..."></textarea>
 
-    <h3>Upload Bukti Pembayaran:</h3>
-    <input type="file" id="bukti">
-    <button onclick="uploadBukti()">Upload Bukti</button>
+    <label for="bukti">Upload Bukti Pembayaran:</label>
+    <input type="file" id="bukti" accept="image/*,application/pdf" />
 
-    <h3>🔔 Notifikasi Anda</h3>
-    <ul id="listNotifikasi" class="notifikasi-list"></ul>
+    <button onclick="kirimPembayaran()">Kirim Pembayaran</button>
+    <p id="status" style="color: green;"></p>
   </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <script src="config.js"></script>
-
   <script>
-    // Load data pelanggan dari localStorage
-    const nama = localStorage.getItem("nama");
-    const nohp = localStorage.getItem("nohp");
+    const nohp = localStorage.getItem('nohp');
+    if (!nohp) window.location.href = 'login_pelanggan.html';
 
-    // Cek jika belum login
-    if (!nama || !nohp) {
-      alert("Silakan login terlebih dahulu.");
-      window.location.href = "login.html";
-    }
+    const db = firebase.database();
 
-    document.getElementById("namaPelanggan").textContent = nama;
-
-    // Data rekening
-    const daftarRekening = {
-      BCA: { nomor: "6880777741", nama: "Asep Jaelani"},
-      BRI: { nomor: "084701025669538", nama: "Asep Jaelani"},
-      MANDIRI: { nomor: "1560017886260", nama: "EUIS JUBAEDAH"},
-      DANA: { nomor: "083895300118", nama: "ASEP JAELANI"}
-    };
-
-    function tampilkanRekening() {
-      const bank = document.getElementById("rekeningSelect").value;
-      const info = document.getElementById("rekeningInfo");
-      const nomor = document.getElementById("nomorRekening");
-      const nama = document.getElementById("namaRekening");
-
-      if (daftarRekening[bank]) {
-        nomor.textContent = daftarRekening[bank].nomor;
-        nama.textContent = daftarRekening[bank].nama;
-        info.style.display = "block";
-      } else {
-        info.style.display = "none";
-      }
-    }
-
-    function salinRekening() {
-      const teks = document.getElementById("nomorRekening").textContent;
-      navigator.clipboard.writeText(teks).then(() => {
-        alert("✅ Nomor rekening disalin!");
-      }).catch(() => {
-        alert("❌ Gagal menyalin");
-      });
-    }
-
-    async function upload() {
-  const file = document.getElementById("buktiPembayaran").files[0];
-  if (!file) {
-    alert("Silakan pilih file.");
-    return;
-  }
-
-  const pelangganID = localStorage.getItem("nohp");
-  const snapshot = await firebase.database().ref("pelanggan/aktif/" + pelangganID).once("value");
-  const data = snapshot.val();
-
-  if (!data) {
-    alert("Data pelanggan tidak ditemukan.");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onloadend = async function () {
-    const base64 = reader.result;
-
-    const payload = {
-      nama: data.nama || "-",
-      nohp: data.telepon || pelangganID,
-      paket: data.paket || "-",
-      harga: data.harga || "-",
-      bukti: base64
-    };
-
-    try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbyYmfAKykfaDARjWk_zbXf9QkMQyrfOYGcYUrKnnFN_NF0jObVsZHjspDq9WyK72vYWEQ/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const result = await response.json();
-      if (result.status === "sukses") {
-        alert("Bukti berhasil dikirim!");
-        document.getElementById("buktiPembayaran").value = "";
-      } else {
-        alert("Gagal mengirim bukti.");
-      }
-    } catch (err) {
-      alert("Terjadi kesalahan.");
-      console.error(err);
-    }
-  };
-
-  reader.readAsDataURL(file);
-}
-
-    // Tampilkan notifikasi
-    const listNotifikasi = document.getElementById("listNotifikasi");
-
-    firebase.database().ref("notifikasi/" + nohp).on("value", snapshot => {
-      listNotifikasi.innerHTML = "";
+    // Ambil data pelanggan dari nohp
+    db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
       if (snapshot.exists()) {
-        snapshot.forEach(child => {
-          const data = child.val();
-          const li = document.createElement("li");
-          li.innerHTML = `<b>${data.waktu}</b><br>${data.pesan}<hr>`;
-          listNotifikasi.appendChild(li);
-        });
+        const data = Object.values(snapshot.val())[0];
+        document.getElementById('nama').value = data.nama;
+        document.getElementById('paket').value = data.paket;
       } else {
-        listNotifikasi.innerHTML = "<li>Belum ada notifikasi.</li>";
+        document.querySelector('.container').innerHTML = '<p>Data pelanggan tidak ditemukan.</p>';
       }
     });
+
+    function kirimPembayaran() {
+      const nama = document.getElementById('nama').value;
+      const paket = document.getElementById('paket').value;
+      const rekening = document.getElementById('rekening').value;
+      const keterangan = document.getElementById('keterangan').value;
+      const buktiFile = document.getElementById('bukti').files[0];
+
+      if (!rekening) {
+        document.getElementById('status').innerText = 'Pilih rekening tujuan terlebih dahulu.';
+        return;
+      }
+
+      if (!keterangan || !buktiFile) {
+        document.getElementById('status').innerText = 'Lengkapi keterangan dan upload bukti pembayaran.';
+        return;
+      }
+
+      const storageRef = firebase.storage().ref('bukti/' + Date.now() + '_' + buktiFile.name);
+      storageRef.put(buktiFile).then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          const data = {
+            nama, paket, telepon: nohp,
+            rekening, keterangan,
+            bukti: url,
+            status: 'Menunggu Konfirmasi',
+            tanggal: new Date().toLocaleString('id-ID')
+          };
+          db.ref('konfirmasi').push(data);
+          document.getElementById('status').innerText = '✅ Bukti pembayaran berhasil dikirim.';
+        });
+      }).catch(err => {
+        document.getElementById('status').innerText = '❌ Gagal upload bukti.';
+        console.error(err);
+      });
+    }
   </script>
 </body>
 </html>
