@@ -16,38 +16,71 @@
       <option value="BRI - 084701025669538 a.n WBM NET">BRI - 084701025669538 a.n Asep Jaelani</option>
       <option value="MANDIRI - 1560017886260 a.n WBM NET">MANDIRI - 1560017886260 a.n EUIS JUBAEDAH</option>
       <option value="DANA - 083895300118 a.n WBM NET">DANA - 083895300118 a.n ASEP JAELANI</option>
-      <option value="QRIS">QRIS - Scan QR Code</option>
+      <option value="QRIS - Scan QR Code">QRIS - Scan QR Code</option>
     </select>
 
-<div id="qrisContainer" style="display: none; margin-top: 15px;">
-  <h4>Silakan Scan QRIS</h4>
-  <img src="qris.jpg" alt="QRIS" style="max-width: 300px;" />
-</div>
+    <textarea id="keterangan" placeholder="Contoh: Transfer via BRImo, atas nama..."></textarea>
+
     <label for="bukti">Upload Bukti Pembayaran:</label>
     <input type="file" id="bukti" accept="image/*,application/pdf" />
+
+    <input type="hidden" id="nama">
+    <input type="hidden" id="paket">
 
     <button onclick="kirimPembayaran()">Kirim Pembayaran</button>
     <p id="status" style="color: green;"></p>
   </div>
 
-  <script src="config.js"></script>
-  <script>
-    const nohp = localStorage.getItem('nohp');
-    if (!nohp) window.location.href = 'login_pelanggan.html';
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+  <script src="firebase.js"></script>
 
+  <script>
     const db = firebase.database();
+    const messaging = firebase.messaging();
+
+    let pelangganID = '';
+    let nohp = '';
+
+    // Ambil nohp dari localStorage (hasil login)
+    nohp = localStorage.getItem("nohp");
+    if (!nohp) {
+      document.querySelector('.container').innerHTML = '<p>❌ Nomor HP tidak ditemukan. Silakan login ulang.</p>';
+      throw new Error("No HP not found");
+    }
 
     // Ambil data pelanggan dari nohp
     db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
       if (snapshot.exists()) {
-        const data = Object.values(snapshot.val())[0];
+        const id = Object.keys(snapshot.val())[0];
+        const data = snapshot.val()[id];
+        pelangganID = id;
+
         document.getElementById('nama').value = data.nama;
         document.getElementById('paket').value = data.paket;
       } else {
-        document.querySelector('.container').innerHTML = '<p>Data pelanggan tidak ditemukan.</p>';
+        document.querySelector('.container').innerHTML = '<p>❌ Data pelanggan tidak ditemukan.</p>';
       }
     });
 
+    // Request izin FCM & simpan token
+    messaging.requestPermission().then(() => {
+      return messaging.getToken();
+    }).then(token => {
+      return db.ref('tokens/' + nohp).set(token);
+    }).catch(err => {
+      console.warn('FCM error:', err);
+    });
+
+    // Notifikasi saat website aktif
+    messaging.onMessage(payload => {
+      alert(`🔔 ${payload.notification.title}\n${payload.notification.body}`);
+    });
+
+    // Kirim data pembayaran
     function kirimPembayaran() {
       const nama = document.getElementById('nama').value;
       const paket = document.getElementById('paket').value;
@@ -56,43 +89,43 @@
       const buktiFile = document.getElementById('bukti').files[0];
 
       if (!rekening) {
-        document.getElementById('status').innerText = 'Pilih rekening tujuan terlebih dahulu.';
+        document.getElementById('status').innerText = '⚠️ Pilih rekening tujuan terlebih dahulu.';
         return;
       }
 
-  function cekMetode() {
-    const metode = document.getElementById("metode").value;
-    const qris = document.getElementById("qrisContainer");
-
-    if (metode === "qris") {
-      qris.style.display = "block";
-    } else {
-      qris.style.display = "none";
-    }
-  }
-
       if (!keterangan || !buktiFile) {
-        document.getElementById('status').innerText = 'Lengkapi keterangan dan upload bukti pembayaran.';
+        document.getElementById('status').innerText = '⚠️ Lengkapi keterangan dan upload bukti pembayaran.';
         return;
       }
 
       const storageRef = firebase.storage().ref('bukti/' + Date.now() + '_' + buktiFile.name);
       storageRef.put(buktiFile).then(snapshot => {
-        snapshot.ref.getDownloadURL().then(url => {
-          const data = {
-            nama, paket, telepon: nohp,
-            rekening, keterangan,
-            bukti: url,
-            status: 'Menunggu Konfirmasi',
-            tanggal: new Date().toLocaleString('id-ID')
-          };
-          db.ref('konfirmasi').push(data);
-          document.getElementById('status').innerText = '✅ Bukti pembayaran berhasil dikirim.';
-        });
+        return snapshot.ref.getDownloadURL();
+      }).then(url => {
+        const data = {
+          nama,
+          paket,
+          telepon: nohp,
+          rekening,
+          keterangan,
+          bukti: url,
+          status: 'Menunggu Konfirmasi',
+          tanggal: new Date().toLocaleString('id-ID')
+        };
+        return db.ref('konfirmasi').push(data);
+      }).then(() => {
+        document.getElementById('status').innerText = '✅ Bukti pembayaran berhasil dikirim.';
       }).catch(err => {
-        document.getElementById('status').innerText = '❌ Gagal upload bukti.';
+        document.getElementById('status').innerText = '❌ Gagal mengirim pembayaran.';
         console.error(err);
       });
+    }
+
+    // Daftarkan service-worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.error('SW failed:', err));
     }
   </script>
 </body>
