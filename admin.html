@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Admin</title>
   <link rel="stylesheet" href="billing.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -12,6 +11,7 @@
   <div class="container">
     <h2>Dashboard Admin</h2>
     <input type="text" id="searchInput" placeholder="🔍 Cari pelanggan...">
+
     <div class="table-wrapper">
       <table id="tabelPelanggan">
         <thead>
@@ -30,31 +30,16 @@
     </div>
   </div>
 
-  <div id="modalKonfirmasi" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="tutupModalKonfirmasi()">&times;</span>
-      <h3>Daftar Konfirmasi Pembayaran</h3>
-      <div id="daftarKonfirmasi">Loading...</div>
-    </div>
-  </div>
-
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
   <script src="config.js"></script>
+
   <script>
     const db = firebase.database();
     const tbody = document.querySelector("#tabelPelanggan tbody");
     const searchInput = document.getElementById("searchInput");
-
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user && user.email === 'wbmnet2020@gmail.com') {
-        tampilkanPelanggan();
-      } else {
-        alert("Silakan login sebagai admin terlebih dahulu.");
-        window.location.href = "login_admin.html";
-      }
-    });
 
     function tampilkanPelanggan() {
       tbody.innerHTML = "";
@@ -72,10 +57,9 @@
             <td>${data.harga}</td>
             <td>${data.keterangan}</td>
             <td>
-              <button onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
-              <button onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
-              <button onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
-              <button onclick="konfirmasiBayar('${id}')"><i class="fas fa-check-circle"></i></button>
+              <button class="aksi-btn edit" onclick="editPelanggan('${id}')"><i class="fas fa-edit"></i></button>
+              <button class="aksi-btn hapus" onclick="hapusPelanggan('${id}')"><i class="fas fa-trash"></i></button>
+              <button class="aksi-btn notif" onclick="kirimNotifikasi('${id}')"><i class="fas fa-bell"></i></button>
             </td>
           `;
           tbody.appendChild(row);
@@ -84,48 +68,67 @@
     }
 
     function editPelanggan(id) {
-      const namaBaru = prompt("Masukkan nama baru:");
-      if (namaBaru) {
-        db.ref("pelanggan" + id + "/nama").set(namaBaru).then(tampilkanPelanggan);
-      }
+      alert("Edit pelanggan: " + id);
     }
 
     function hapusPelanggan(id) {
       if (confirm("Yakin ingin menghapus pelanggan ini?")) {
-        db.ref("pelanggan" + id).remove().then(() => {
+        db.ref("pelanggan/" + id).remove().then(() => {
           alert("Pelanggan dihapus!");
           tampilkanPelanggan();
         });
       }
     }
 
-    function kirimNotifikasi(id) {
-      db.ref("pelanggan/" + id).once("value").then(snapshot => {
+    function kirimNotifikasi(idPelanggan) {
+      const ref = db.ref("pelanggan/" + idPelanggan);
+      ref.once("value").then(snapshot => {
+        if (!snapshot.exists()) return alert("❌ Pelanggan tidak ditemukan.");
         const data = snapshot.val();
         const waktu = new Date().toLocaleString('id-ID');
         const pesan = `Halo ${data.nama}, tagihan Anda sebesar Rp${data.harga} untuk paket ${data.paket} telah jatuh tempo.`;
 
-        db.ref("notifikasi" + data.telepon).push({
-          nama: data.nama, paket: data.paket, harga: data.harga,
-          waktu: waktu, pesan: pesan, status: "belum dibaca"
-        }).then(() => alert("📩 Notifikasi dikirim!"));
-      });
-    }
+        // Simpan ke database notifikasi
+        db.ref("notifikasi/" + data.telepon).push({
+          nama: data.nama,
+          paket: data.paket,
+          harga: data.harga,
+          waktu: waktu,
+          pesan: pesan,
+          status: "belum dibaca"
+        });
 
-    function konfirmasiBayar(id) {
-      db.ref("pelanggan" + id).once("value").then(snapshot => {
-        const data = snapshot.val();
-        db.ref("pelanggan/lunas/" + id).set(data).then(() => {
-          db.ref("pelanggan/aktif/" + id).remove().then(() => {
-            alert("✅ Pembayaran dikonfirmasi.");
-            tampilkanPelanggan();
+        // Ambil token FCM pelanggan
+        db.ref("tokens/" + data.telepon).once("value").then(tokenSnap => {
+          const token = tokenSnap.val();
+          if (!token) {
+            alert("❗ Token FCM pelanggan tidak ditemukan. Pastikan pelanggan pernah buka aplikasi.");
+            return;
+          }
+
+          // Kirim notifikasi via FCM API
+          fetch("https://fcm.googleapis.com/fcm/send", {
+            method: "POST",
+            headers: {
+              "Authorization": "key=BMKUc3Lnq5jvnMheNlporHVZH8oGLIviT1HQpetC-MWZg8ZJAijX1XYTJT_lyNYyk8ZT__j48R5E-EvdsEp9x0o", // Ganti dengan server key
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              to: token,
+              notification: {
+                title: "Tagihan Baru",
+                body: pesan
+              }
+            })
+          }).then(res => {
+            if (res.ok) {
+              alert("📩 Notifikasi push berhasil dikirim!");
+            } else {
+              alert("❌ Gagal kirim push notifikasi.");
+            }
           });
         });
       });
-    }
-
-    function tutupModalKonfirmasi() {
-      document.getElementById("modalKonfirmasi").style.display = "none";
     }
 
     searchInput.addEventListener("input", () => {
@@ -136,6 +139,8 @@
         row.style.display = text.includes(keyword) ? "" : "none";
       });
     });
+
+    tampilkanPelanggan();
   </script>
 </body>
 </html>
