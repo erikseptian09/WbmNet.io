@@ -9,12 +9,15 @@ body {
   background-color: #f4f6f9;
   color: #333;
   padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full height viewport */
 }
 
-/* Container */
 .container {
   max-width: 500px;
-  margin: auto;
+  width: 100%;
   background: #fff;
   padding: 25px;
   border-radius: 10px;
