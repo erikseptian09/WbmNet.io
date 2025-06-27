@@ -10,9 +10,9 @@
     <h2>Formulir Pembayaran</h2>
 
     <div id="infoPelanggan">
-      <p><strong>Nama:</strong> <span id="tampilNama">-</span></p>
-      <p><strong>Paket:</strong> <span id="tampilPaket">-</span></p>
-      <p><strong>Jumlah Bayar:</strong> Rp <span id="tampilHarga">-</span></p>
+      <p>👤 <strong>Nama:</strong> <span id="tampilNama">-</span></p>
+      <p>📶 <strong>Paket:</strong> <span id="tampilPaket">-</span></p>
+      <p>💰 <strong>Jumlah Bayar:</strong> Rp <span id="tampilHarga">-</span></p>
     </div>
 
     <label for="rekening">Pilih Rekening Tujuan:</label>
@@ -25,7 +25,7 @@
       <option value="QRIS - Scan QR Code">QRIS - Scan QR Code</option>
     </select>
 
-    <img id="qrisImg" src="qriss.jpg" alt="QRIS Code">
+    <img id="qrisImg" src="qris.png" alt="QRIS Code">
 
     <textarea id="keterangan" placeholder="Contoh: Transfer via BRImo, atas nama..."></textarea>
 
@@ -37,7 +37,7 @@
     <input type="hidden" id="harga">
 
     <button onclick="kirimPembayaran()">Kirim Pembayaran</button>
-    <p id="status" style="color: green;"></p>
+    <p id="status"></p>
   </div>
 
   <!-- Firebase -->
