@@ -4,13 +4,29 @@
   <meta charset="UTF-8">
   <title>Form Pembayaran Pelanggan</title>
   <link rel="stylesheet" href="billing.css">
+  <style>
+    #qrisImg {
+      display: none;
+      max-width: 200px;
+      margin-top: 10px;
+    }
+    #infoPelanggan p {
+      margin: 4px 0;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h2>Formulir Pembayaran</h2>
 
+    <div id="infoPelanggan">
+      <p><strong>Nama:</strong> <span id="tampilNama">-</span></p>
+      <p><strong>Paket:</strong> <span id="tampilPaket">-</span></p>
+      <p><strong>Jumlah Bayar:</strong> Rp <span id="tampilHarga">-</span></p>
+    </div>
+
     <label for="rekening">Pilih Rekening Tujuan:</label>
-    <select id="rekening">
+    <select id="rekening" onchange="cekRekening()">
       <option value="" disabled selected>-- Pilih Rekening Tujuan --</option>
       <option value="BCA - 6880777741 a.n WBM NET">BCA - 6880777741 a.n Asep Jaelani</option>
       <option value="BRI - 084701025669538 a.n WBM NET">BRI - 084701025669538 a.n Asep Jaelani</option>
@@ -19,6 +35,8 @@
       <option value="QRIS - Scan QR Code">QRIS - Scan QR Code</option>
     </select>
 
+    <img id="qrisImg" src="qriss.jpg" alt="QRIS Code">
+
     <textarea id="keterangan" placeholder="Contoh: Transfer via BRImo, atas nama..."></textarea>
 
     <label for="bukti">Upload Bukti Pembayaran:</label>
@@ -26,6 +44,7 @@
 
     <input type="hidden" id="nama">
     <input type="hidden" id="paket">
+    <input type="hidden" id="harga">
 
     <button onclick="kirimPembayaran()">Kirim Pembayaran</button>
     <p id="status" style="color: green;"></p>
@@ -41,19 +60,15 @@
   <script>
     const db = firebase.database();
     const messaging = firebase.messaging();
-
     let pelangganID = '';
-    let nohp = '';
+    let nohp = localStorage.getItem("nohp");
 
-    // Ambil nohp dari localStorage (hasil login)
-    nohp = localStorage.getItem("nohp");
     if (!nohp) {
       document.querySelector('.container').innerHTML = '<p>❌ Nomor HP tidak ditemukan. Silakan login ulang.</p>';
       throw new Error("No HP not found");
     }
 
-    // Ambil data pelanggan dari nohp
-    db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value', snapshot => {
+    db.ref('pelanggan').orderByChild('telepon').equalTo(nohp).once('value').then(snapshot => {
       if (snapshot.exists()) {
         const id = Object.keys(snapshot.val())[0];
         const data = snapshot.val()[id];
@@ -61,29 +76,38 @@
 
         document.getElementById('nama').value = data.nama;
         document.getElementById('paket').value = data.paket;
+        document.getElementById('harga').value = data.harga;
+
+        document.getElementById('tampilNama').innerText = data.nama;
+        document.getElementById('tampilPaket').innerText = data.paket;
+        document.getElementById('tampilHarga').innerText = Number(data.harga).toLocaleString('id-ID');
       } else {
         document.querySelector('.container').innerHTML = '<p>❌ Data pelanggan tidak ditemukan.</p>';
       }
     });
 
-    // Request izin FCM & simpan token
-    messaging.requestPermission().then(() => {
-      return messaging.getToken();
-    }).then(token => {
+    messaging.requestPermission().then(() => messaging.getToken()).then(token => {
       return db.ref('tokens/' + nohp).set(token);
-    }).catch(err => {
-      console.warn('FCM error:', err);
-    });
+    }).catch(err => console.warn('FCM error:', err));
 
-    // Notifikasi saat website aktif
     messaging.onMessage(payload => {
       alert(`🔔 ${payload.notification.title}\n${payload.notification.body}`);
     });
 
-    // Kirim data pembayaran
+    function cekRekening() {
+      const rekening = document.getElementById('rekening').value;
+      const qrisImg = document.getElementById('qrisImg');
+      if (rekening.includes('QRIS')) {
+        qrisImg.style.display = 'block';
+      } else {
+        qrisImg.style.display = 'none';
+      }
+    }
+
     function kirimPembayaran() {
       const nama = document.getElementById('nama').value;
       const paket = document.getElementById('paket').value;
+      const harga = document.getElementById('harga').value;
       const rekening = document.getElementById('rekening').value;
       const keterangan = document.getElementById('keterangan').value;
       const buktiFile = document.getElementById('bukti').files[0];
@@ -92,19 +116,17 @@
         document.getElementById('status').innerText = '⚠️ Pilih rekening tujuan terlebih dahulu.';
         return;
       }
-
       if (!keterangan || !buktiFile) {
         document.getElementById('status').innerText = '⚠️ Lengkapi keterangan dan upload bukti pembayaran.';
         return;
       }
 
       const storageRef = firebase.storage().ref('bukti/' + Date.now() + '_' + buktiFile.name);
-      storageRef.put(buktiFile).then(snapshot => {
-        return snapshot.ref.getDownloadURL();
-      }).then(url => {
+      storageRef.put(buktiFile).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
         const data = {
           nama,
           paket,
+          harga,
           telepon: nohp,
           rekening,
           keterangan,
@@ -121,7 +143,6 @@
       });
     }
 
-    // Daftarkan service-worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(reg => console.log('SW registered:', reg.scope))
