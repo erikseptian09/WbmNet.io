@@ -1,4 +1,3 @@
-/* Reset & base font */
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +11,6 @@ body {
   padding: 20px;
 }
 
-/* Container */
 .container {
   max-width: 500px;
   margin: auto;
@@ -28,7 +26,22 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* Input & Select */
+#infoPelanggan {
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fcfdff;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+#infoPelanggan p {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
 input[type="text"],
 input[type="file"],
 textarea,
@@ -49,7 +62,6 @@ select:focus {
   outline: none;
 }
 
-/* Button */
 button {
   width: 100%;
   padding: 12px;
@@ -66,28 +78,21 @@ button:hover {
   background-color: #0c59c1;
 }
 
-/* Status text */
 #status {
   text-align: center;
   margin-top: 10px;
   font-weight: bold;
 }
 
-/* Info Pelanggan */
-#infoPelanggan p {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-/* QRIS image */
 #qrisImg {
-  display: block;
-  margin: 10px auto;
+  display: none;
+  width: 100%;
+  height: auto;
+  margin: 10px 0;
   border: 1px solid #ddd;
   border-radius: 6px;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
   .container {
     padding: 15px;
