@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Daftar Langganan</title>
+  <link rel="stylesheet" href="billing.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Form Pendaftaran Langganan</h2>
+
+    <input type="text" id="nama" placeholder="Nama Lengkap">
+    <input type="text" id="alamat" placeholder="Alamat Lengkap">
+    <input type="text" id="telepon" placeholder="Nomor HP (contoh: 08123456789)">
+    
+    <select id="paket">
+      <option value="" disabled selected>Pilih Paket</option>
+      <option value="Paket Basic">Paket Basic</option>
+      <option value="Paket Standard">Paket Standard</option>
+      <option value="Paket Premium">Paket Premium</option>
+    </select>
+
+    <button onclick="daftarPelanggan()">Daftar</button>
+    <p id="status" style="text-align:center; margin-top:10px;"></p>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="config.js"></script>
+
+  <script>
+    const db = firebase.database();
+
+    function daftarPelanggan() {
+      const nama = document.getElementById('nama').value.trim();
+      const alamat = document.getElementById('alamat').value.trim();
+      const telepon = document.getElementById('telepon').value.trim();
+      const paket = document.getElementById('paket').value;
+      const password = document.getElementById('password').value.trim();
+      const harga = paket === 'Paket Basic' ? 150000 :
+                    paket === 'Paket Standard' ? 170000 :
+                    paket === 'Paket Premium' ? 200000 : 0;
+
+      if (!nama || !alamat || !telepon || !paket) {
+        document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
+        return;
+      }
+
+      const data = {
+        nama,
+        alamat,
+        telepon,
+        paket,
+        harga,
+        password: password || "-",
+        status: 'Aktif',
+        tanggal_daftar: new Date().toLocaleString('id-ID')
+      };
+
+      db.ref('pelanggan').push(data)
+        .then(() => {
+          document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
+          // Reset form
+          document.getElementById('nama').value = '';
+          document.getElementById('alamat').value = '';
+          document.getElementById('telepon').value = '';
+          document.getElementById('paket').value = '';
+          document.getElementById('password').value = '';
+        })
+        .catch(err => {
+          document.getElementById('status').innerText = '❌ Gagal mendaftar.';
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
