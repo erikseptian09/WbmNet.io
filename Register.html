@@ -30,8 +30,6 @@
   <script src="config.js"></script>
 
 <script>
-  const db = firebase.database();
-
   // Fungsi aman untuk buka WA di PWA
   function bukaWA(nomorAdmin, pesan) {
     const link = document.createElement('a');
@@ -54,33 +52,27 @@
       return;
     }
 
-    // Pesan santai untuk WA
+    // 1. Kirim ke WhatsApp
     const nomorAdmin = "6285817230536"; // Ganti nomor admin
-    const pesan = `Hai, saya mau daftar langganan di WBM.NET😄%0A%0A` +
+    const pesan = `Hai, saya mau daftar langganan di Wbm.Net%0A%0A` +
                   `Nama: ${nama}%0A` +
                   `Alamat: ${alamat}%0A` +
                   `No HP: ${telepon}%0A` +
                   `Paket: ${paket}`;
-
     bukaWA(nomorAdmin, pesan);
 
-    // Simpan ke Firebase
-    const data = {
-      nama,
-      alamat,
-      telepon,
-      paket,
-      status: 'Aktif',
-      tanggal_daftar: new Date().toLocaleString('id-ID')
-    };
-    db.ref('pelanggan').push(data);
+    // 2. Kirim ke Google Sheets via Apps Script Web App
+    fetch("https://script.google.com/macros/s/AKfycbzx_Kj9bUoAPVrBQkeUHeEP-uRHX3sshkxJvAlBFDp_tzQyXHR1CDqmCoyBfA0SX9XpoQ/exec", { // Ganti dengan URL Web App dari Apps Script
+      method: "POST",
+      body: JSON.stringify({ nama, alamat, telepon, paket }),
+      headers: { "Content-Type": "application/json" }
+    });
 
     // Reset form
     document.getElementById('nama').value = '';
     document.getElementById('alamat').value = '';
     document.getElementById('telepon').value = '';
     document.getElementById('paket').value = '';
-
     document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
   }
 </script>
