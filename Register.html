@@ -58,18 +58,19 @@
 
     db.ref('pelanggan').push(data)
       .then(() => {
-  document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
+        document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
 
-  const nomorAdmin = "6285817230536";
-  const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
-  location.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
+        // Kirim ke WhatsApp langsung (tanpa popup)
+        const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
+        const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
+        location.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
 
-  // Reset form
-  document.getElementById('nama').value = '';
-  document.getElementById('alamat').value = '';
-  document.getElementById('telepon').value = '';
-  document.getElementById('paket').value = '';
-})
+        // Reset form
+        document.getElementById('nama').value = '';
+        document.getElementById('alamat').value = '';
+        document.getElementById('telepon').value = '';
+        document.getElementById('paket').value = '';
+      })
       .catch(err => {
         document.getElementById('status').innerText = '❌ Gagal mendaftar.';
         console.error(err);
