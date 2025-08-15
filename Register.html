@@ -4,16 +4,6 @@
   <meta charset="UTF-8">
   <title>Daftar Langganan</title>
   <link rel="stylesheet" href="billing.css">
-  <style>
-    #harga {
-      background: #f5f5f5;
-      padding: 8px;
-      border-radius: 5px;
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
 <body>
   <div class="container">
@@ -25,12 +15,10 @@
     
     <select id="paket">
       <option value="" disabled selected>Pilih Paket</option>
-      <option value="Paket Basic">Paket Basic</option>
-      <option value="Paket Standard">Paket Family</option>
-      <option value="Paket Premium">Paket Profesional</option>
+      <option value="Paket Basic">Paket Basic 5Mbps</option>
+      <option value="Paket Standard">Paket Family 7Mbps</option>
+      <option value="Paket Premium">Paket Profesional 10Mbps</option>
     </select>
-
-    <div id="harga">Harga: -</div>
 
     <button onclick="daftarPelanggan()">Daftar</button>
     <p id="status" style="text-align:center; margin-top:10px;"></p>
@@ -43,19 +31,6 @@
 
 <script>
   const db = firebase.database();
-  let hargaPaket = 0;
-
-  // Update harga saat paket dipilih
-  document.getElementById('paket').addEventListener('change', function() {
-    const paket = this.value;
-    hargaPaket = paket === 'Paket Basic' ? 150000 :
-                 paket === 'Paket Family' ? 170000 :
-                 paket === 'Paket Profesional' ? 200000 : 0;
-
-    document.getElementById('harga').innerText = hargaPaket > 0
-      ? `Harga: Rp${hargaPaket.toLocaleString('id-ID')}`
-      : 'Harga: -';
-  });
 
   // Fungsi aman untuk buka WA di PWA
   function bukaWA(nomorAdmin, pesan) {
@@ -79,9 +54,14 @@
       return;
     }
 
-    // Kirim WA langsung
-    const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
-    const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${hargaPaket.toLocaleString('id-ID')}`;
+    // Pesan santai untuk WA
+    const nomorAdmin = "6285817230536"; // Ganti nomor admin
+    const pesan = `Hai, saya mau daftar langganan di WBM.NET😄%0A%0A` +
+                  `Nama: ${nama}%0A` +
+                  `Alamat: ${alamat}%0A` +
+                  `No HP: ${telepon}%0A` +
+                  `Paket: ${paket}`;
+
     bukaWA(nomorAdmin, pesan);
 
     // Simpan ke Firebase
@@ -90,7 +70,6 @@
       alamat,
       telepon,
       paket,
-      harga: hargaPaket,
       status: 'Aktif',
       tanggal_daftar: new Date().toLocaleString('id-ID')
     };
@@ -101,8 +80,6 @@
     document.getElementById('alamat').value = '';
     document.getElementById('telepon').value = '';
     document.getElementById('paket').value = '';
-    document.getElementById('harga').innerText = 'Harga: -';
-    hargaPaket = 0;
 
     document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
   }
