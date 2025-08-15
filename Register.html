@@ -38,8 +38,8 @@
     const telepon = document.getElementById('telepon').value.trim();
     const paket = document.getElementById('paket').value;
     const harga = paket === 'Paket Basic' ? 150000 :
-                  paket === 'Paket Standard' ? 170000 :
-                  paket === 'Paket Premium' ? 200000 : 0;
+                  paket === 'Paket Family' ? 170000 :
+                  paket === 'Paket Profesional' ? 200000 : 0;
 
     if (!nama || !alamat || !telepon || !paket) {
       document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
