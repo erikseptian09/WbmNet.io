@@ -29,50 +29,53 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="config.js"></script>
 
-  <script>
-    const db = firebase.database();
+<script>
+  const db = firebase.database();
 
-    function daftarPelanggan() {
-      const nama = document.getElementById('nama').value.trim();
-      const alamat = document.getElementById('alamat').value.trim();
-      const telepon = document.getElementById('telepon').value.trim();
-      const paket = document.getElementById('paket').value;
-      const password = document.getElementById('password').value.trim();
-      const harga = paket === 'Paket Basic' ? 150000 :
-                    paket === 'Paket Standard' ? 170000 :
-                    paket === 'Paket Premium' ? 200000 : 0;
+  function daftarPelanggan() {
+    const nama = document.getElementById('nama').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const telepon = document.getElementById('telepon').value.trim();
+    const paket = document.getElementById('paket').value;
+    const harga = paket === 'Paket Basic' ? 150000 :
+                  paket === 'Paket Standard' ? 170000 :
+                  paket === 'Paket Premium' ? 200000 : 0;
 
-      if (!nama || !alamat || !telepon || !paket) {
-        document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
-        return;
-      }
-
-      const data = {
-        nama,
-        alamat,
-        telepon,
-        paket,
-        harga,
-        password: password || "-",
-        status: 'Aktif',
-        tanggal_daftar: new Date().toLocaleString('id-ID')
-      };
-
-      db.ref('pelanggan').push(data)
-        .then(() => {
-          document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
-          // Reset form
-          document.getElementById('nama').value = '';
-          document.getElementById('alamat').value = '';
-          document.getElementById('telepon').value = '';
-          document.getElementById('paket').value = '';
-          document.getElementById('password').value = '';
-        })
-        .catch(err => {
-          document.getElementById('status').innerText = '❌ Gagal mendaftar.';
-          console.error(err);
-        });
+    if (!nama || !alamat || !telepon || !paket) {
+      document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
+      return;
     }
-  </script>
+
+    const data = {
+      nama,
+      alamat,
+      telepon,
+      paket,
+      harga,
+      status: 'Aktif',
+      tanggal_daftar: new Date().toLocaleString('id-ID')
+    };
+
+    db.ref('pelanggan').push(data)
+      .then(() => {
+        document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
+
+        // Kirim ke WhatsApp (ganti nomor admin di bawah)
+        const nomorAdmin = "6285817230536"; // format internasional tanpa +
+        const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
+        window.open(`https://wa.me/${nomorAdmin}?text=${pesan}`, '_blank');
+
+        // Reset form
+        document.getElementById('nama').value = '';
+        document.getElementById('alamat').value = '';
+        document.getElementById('telepon').value = '';
+        document.getElementById('paket').value = '';
+      })
+      .catch(err => {
+        document.getElementById('status').innerText = '❌ Gagal mendaftar.';
+        console.error(err);
+      });
+  }
+</script>
 </body>
 </html>
