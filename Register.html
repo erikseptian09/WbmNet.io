@@ -38,8 +38,8 @@
     const telepon = document.getElementById('telepon').value.trim();
     const paket = document.getElementById('paket').value;
     const harga = paket === 'Paket Basic' ? 150000 :
-                  paket === 'Paket Family' ? 170000 :
-                  paket === 'Paket Profesional' ? 200000 : 0;
+                  paket === 'Paket Standard' ? 170000 :
+                  paket === 'Paket Premium' ? 200000 : 0;
 
     if (!nama || !alamat || !telepon || !paket) {
       document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
@@ -70,6 +70,11 @@
   document.getElementById('telepon').value = '';
   document.getElementById('paket').value = '';
 })
+      .catch(err => {
+        document.getElementById('status').innerText = '❌ Gagal mendaftar.';
+        console.error(err);
+      });
+  }
 </script>
 </body>
 </html>
