@@ -59,15 +59,20 @@
 
     // Kirim WA langsung (supaya tidak tergantung kecepatan Firebase)
     const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
-    const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: `;
+    const pesan = `Halo Admin,%0ASaya ingin berlangganan di Wbm.Net:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: `;
     bukaWA(nomorAdmin, pesan);
 
     // Simpan ke Firebase (jalan di background)
+    const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${hargaPaket.toLocaleString('id-ID')}`;
+    bukaWA(nomorAdmin, pesan);
+
+    // Simpan ke Firebase
     const data = {
       nama,
       alamat,
       telepon,
       paket,
+      harga: hargaPaket,
       status: 'Aktif',
       tanggal_daftar: new Date().toLocaleString('id-ID')
     };
@@ -78,6 +83,9 @@
     document.getElementById('alamat').value = '';
     document.getElementById('telepon').value = '';
     document.getElementById('paket').value = '';
+    document.getElementById('harga').innerText = 'Harga: -';
+    hargaPaket = 0;
+
     document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
   }
 </script>
