@@ -32,6 +32,17 @@
 <script>
   const db = firebase.database();
 
+  // Fungsi aman untuk buka WA di PWA
+  function bukaWA(nomorAdmin, pesan) {
+    const link = document.createElement('a');
+    link.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   function daftarPelanggan() {
     const nama = document.getElementById('nama').value.trim();
     const alamat = document.getElementById('alamat').value.trim();
@@ -46,6 +57,12 @@
       return;
     }
 
+    // Kirim WA langsung (supaya tidak tergantung kecepatan Firebase)
+    const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
+    const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
+    bukaWA(nomorAdmin, pesan);
+
+    // Simpan ke Firebase (jalan di background)
     const data = {
       nama,
       alamat,
@@ -55,26 +72,14 @@
       status: 'Aktif',
       tanggal_daftar: new Date().toLocaleString('id-ID')
     };
+    db.ref('pelanggan').push(data);
 
-    db.ref('pelanggan').push(data)
-      .then(() => {
-        document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
-
-        // Kirim ke WhatsApp langsung (tanpa popup)
-        const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
-        const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
-        location.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
-
-        // Reset form
-        document.getElementById('nama').value = '';
-        document.getElementById('alamat').value = '';
-        document.getElementById('telepon').value = '';
-        document.getElementById('paket').value = '';
-      })
-      .catch(err => {
-        document.getElementById('status').innerText = '❌ Gagal mendaftar.';
-        console.error(err);
-      });
+    // Reset form
+    document.getElementById('nama').value = '';
+    document.getElementById('alamat').value = '';
+    document.getElementById('telepon').value = '';
+    document.getElementById('paket').value = '';
+    document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
   }
 </script>
 </body>
