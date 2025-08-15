@@ -38,8 +38,8 @@
     const telepon = document.getElementById('telepon').value.trim();
     const paket = document.getElementById('paket').value;
     const harga = paket === 'Paket Basic' ? 150000 :
-                  paket === 'Paket Standard' ? 170000 :
-                  paket === 'Paket Premium' ? 200000 : 0;
+                  paket === 'Paket Family' ? 170000 :
+                  paket === 'Paket Profesional' ? 200000 : 0;
 
     if (!nama || !alamat || !telepon || !paket) {
       document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
@@ -58,24 +58,18 @@
 
     db.ref('pelanggan').push(data)
       .then(() => {
-        document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
+  document.getElementById('status').innerText = '✅ Pendaftaran berhasil!';
 
-        // Kirim ke WhatsApp (ganti nomor admin di bawah)
-        const nomorAdmin = "6285817230536"; // format internasional tanpa +
-        const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
-        window.open(`https://wa.me/${nomorAdmin}?text=${pesan}`, '_blank');
+  const nomorAdmin = "6285817230536";
+  const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${harga.toLocaleString('id-ID')}`;
+  location.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
 
-        // Reset form
-        document.getElementById('nama').value = '';
-        document.getElementById('alamat').value = '';
-        document.getElementById('telepon').value = '';
-        document.getElementById('paket').value = '';
-      })
-      .catch(err => {
-        document.getElementById('status').innerText = '❌ Gagal mendaftar.';
-        console.error(err);
-      });
-  }
+  // Reset form
+  document.getElementById('nama').value = '';
+  document.getElementById('alamat').value = '';
+  document.getElementById('telepon').value = '';
+  document.getElementById('paket').value = '';
+})
 </script>
 </body>
 </html>
