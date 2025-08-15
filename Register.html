@@ -52,18 +52,36 @@
                   paket === 'Paket Family' ? 170000 :
                   paket === 'Paket Profesional' ? 200000 : 0;
 
+    document.getElementById('harga').innerText = hargaPaket > 0
+      ? `Harga: Rp${hargaPaket.toLocaleString('id-ID')}`
+      : 'Harga: -';
+  });
+
+  // Fungsi aman untuk buka WA di PWA
+  function bukaWA(nomorAdmin, pesan) {
+    const link = document.createElement('a');
+    link.href = `https://wa.me/${nomorAdmin}?text=${pesan}`;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function daftarPelanggan() {
+    const nama = document.getElementById('nama').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const telepon = document.getElementById('telepon').value.trim();
+    const paket = document.getElementById('paket').value;
+
     if (!nama || !alamat || !telepon || !paket) {
       document.getElementById('status').innerText = '⚠️ Lengkapi semua field!';
       return;
     }
 
-    // Kirim WA langsung (supaya tidak tergantung kecepatan Firebase)
+    // Kirim WA langsung
     const nomorAdmin = "6285817230536"; // Ganti dengan nomor admin
-    const pesan = `Halo Admin,%0ASaya ingin berlangganan di Wbm.Net:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: `;
-    bukaWA(nomorAdmin, pesan);
-
-    // Simpan ke Firebase (jalan di background)
-    const pesan = `Halo Admin,%0ASaya ingin mendaftar:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${hargaPaket.toLocaleString('id-ID')}`;
+    const pesan = `Halo Admin,%0ASaya ingin berlangganan di WBM.NET:%0A%0ANama: ${nama}%0AAlamat: ${alamat}%0ANo HP: ${telepon}%0APaket: ${paket}%0AHarga: Rp${hargaPaket.toLocaleString('id-ID')}`;
     bukaWA(nomorAdmin, pesan);
 
     // Simpan ke Firebase
