@@ -41,7 +41,7 @@
     document.body.removeChild(link);
   }
 
-  function daftarPelanggan() {
+  async function daftarPelanggan() {
     const nama = document.getElementById('nama').value.trim();
     const alamat = document.getElementById('alamat').value.trim();
     const telepon = document.getElementById('telepon').value.trim();
@@ -62,11 +62,22 @@
     bukaWA(nomorAdmin, pesan);
 
     // 2. Kirim ke Google Sheets via Apps Script Web App
-    fetch("https://script.google.com/macros/s/AKfycbwcKStHqFHxAofS5Ia6lEqZADbiJCXhI2tGJDMeh4u9kMPlLgBzGPRXA_TGupJJS6zb/exec", { // Ganti dengan URL Web App dari Apps Script
-      method: "POST",
-      body: JSON.stringify({ nama, alamat, telepon, paket }),
-      headers: { "Content-Type": "application/json" }
-    });
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbwcKStHqFHxAofS5Ia6lEqZADbiJCXhI2tGJDMeh4u9kMPlLgBzGPRXA_TGupJJS6zb/exec", {
+        method: "POST",
+        body: JSON.stringify({ nama, alamat, telepon, paket }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const result = await response.json();
+      if (result.result === "success") {
+        console.log("✅ Data berhasil tersimpan di Google Sheets.");
+      } else {
+        console.error("⚠️ Gagal simpan ke Google Sheets:", result);
+      }
+    } catch (err) {
+      console.error("❌ Error fetch:", err);
+    }
 
     // Reset form
     document.getElementById('nama').value = '';
