@@ -62,7 +62,7 @@
     bukaWA(nomorAdmin, pesan);
 
     // 2. Kirim ke Google Sheets via Apps Script Web App
-    fetch("https://script.google.com/macros/s/AKfycbzx_Kj9bUoAPVrBQkeUHeEP-uRHX3sshkxJvAlBFDp_tzQyXHR1CDqmCoyBfA0SX9XpoQ/exec", { // Ganti dengan URL Web App dari Apps Script
+    fetch("https://script.google.com/macros/s/AKfycbwcKStHqFHxAofS5Ia6lEqZADbiJCXhI2tGJDMeh4u9kMPlLgBzGPRXA_TGupJJS6zb/exec", { // Ganti dengan URL Web App dari Apps Script
       method: "POST",
       body: JSON.stringify({ nama, alamat, telepon, paket }),
       headers: { "Content-Type": "application/json" }
