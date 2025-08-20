@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WBM.NET</title>
+  <title>Wibawamulia.Network</title>
   
     <!-- Manifest dan Ikon -->
   <link rel="manifest" href="manifest.json">
@@ -28,6 +28,31 @@
   <link rel="stylesheet" href="style.css" />
 
   <style>
+ .header-ad-container {
+    max-width: 900px;
+    overflow: hidden;
+    text-align: center; /* supaya gambar di tengah */
+  }
+  .ad-slider {
+    position: relative;
+  }
+  .ad-img {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-height: 180px; /* batas tinggi, bisa diubah */
+    height: auto; /* tinggi menyesuaikan proporsi */
+    border-radius: 10px;
+    background-color: #fff; /* kalau ada sisa ruang */
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+  .ad-img.active {
+    opacity: 1;
+    position: relative;
+  }
+  
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -50,7 +75,6 @@
         <li class="nav-item"><a class="nav-link" href="#paket">Paket</a></li>
         <li class="nav-item"><a class="nav-link" href="#testimoni">Testimoni</a></li>
         <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
-        <li class="nav-item"><a class="nav-link" href="Register.html">Register</a></li>
         <button id="installBtn" style="display: none;">Install Aplikasi</button>
       </ul>
     </div>
@@ -61,7 +85,19 @@
 <header class="hero text-white text-center">
   <h1 id="typed-text"><span id="part1"></span><span id="part2"></span></h1>
   <p class="lead" style="animation: fadeIn 2s ease-in;">Layanan Internet Berkualitas untuk Rumah dan Usaha Anda</p>
+  
+  <a href="Register.html" class="btn btn-primary btn-lg mt-3">
+    <i class="fas fa-user-plus"></i> Daftar Sekarang
+  </a>
 </header>
+
+<div class="header-ad-container container my-4">
+  <div class="ad-slider">
+    <img src="wbm1.jpg" alt="Banner 1" class="ad-img active">
+    <img src="wbm2.jpg" alt="Banner 2" class="ad-img">
+    <img src="wbm4.jpg" alt="Banner 3" class="ad-img">
+  </div>
+</div>
 
 <!-- Main Content -->
 <main class="container py-5">
@@ -164,6 +200,19 @@
       .then(() => console.log('Service Worker terdaftar!'))
       .catch(err => console.error('Gagal daftar SW:', err));
   }
+</script>
+<script>
+  const ads = document.querySelectorAll('.ad-img');
+  let currentAd = 0;
+
+  function showNextAd() {
+    ads[currentAd].classList.remove('active');
+    currentAd = (currentAd + 1) % ads.length;
+    ads[currentAd].classList.add('active');
+  }
+
+  // Ganti iklan setiap 3 detik
+  setInterval(showNextAd, 3000);
 </script>
 <script>
   // Scroll Reveal Animasi
